@@ -36,4 +36,5 @@ RUN conda init \
 && conda create -n intelligent python=3.7 \
 && conda install -n intelligent matplotlib \
 && conda install -n intelligent scikit-learn \
-&& conda install -n intelligent pandas 
+&& conda install -n intelligent pandas \
+&& conda install -n intelligent opencv 
