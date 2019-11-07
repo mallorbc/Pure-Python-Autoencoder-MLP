@@ -6,30 +6,22 @@ import re
 
 def load_text_file(path_to_file):
     all_data = []
-    float_data = []
-    print("loaded")
     with open(path_to_file) as f:
         all_lines = f.read().splitlines()
     for lines in all_lines:
+        #splits the lines based on tab
         lines = lines.split('\t')
-        # map(float, lines)
-        # # [float(i) for i in lines]
-        # # for entry in lines:
-        # #     lines = float(entry)
-        # print(type(lines[0]))
-        # print(len(lines))
-        # quit()
+        #converts all the values in the list to a float value insted of a string value
+        for index, item in enumerate(lines):
+            #converts the data
+            lines[index] = float(item)
+        #adds the converted data to a list
+        all_data.append(lines)
+    print("All data loaded and converted to float")
 
-    # file_to_read = open(path_to_file,"r")
-    # all_file_lines = file_to_read.readlines()
-    # for line in all_file_lines:
-    #     re.split(r"\t+",line)
-    #     print(len(line))
-    #     print(line)
-    #     quit()
-    #     # split_line = line.split(" ")
-    #     # print(len(split_line))
-    # quit()
+    # print(len(all_data))
+    # print(len(all_data[0]))
+
 
 
 
