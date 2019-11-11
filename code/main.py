@@ -67,10 +67,18 @@ if __name__ == '__main__':
             test_text_data, test_label_data, output_dir, "test")
 
         print("Training and test data set made")
+
+    # this is the mode that creates the MLP
     elif mode == 3:
-        network_input_size = input("How many inputs does the network have? ")
-        network_output_size = input("How many outputs does the network have? ")
+        # network_input_size = input("How many inputs does the network have? ")
+        # network_output_size = input("How many outputs does the network have? ")
+        network_input_size = 784
+        network_output_size = 10
         hidden_layers = input("How many hidden does the network have? ")
+        # makes sure that all the inputs are integers
+        network_input_size = int(network_input_size)
+        network_output_size = int(network_output_size)
+        hidden_layers = int(hidden_layers)
         mlp = Multi_Layer_Perceptron(
             network_input_size, network_output_size, hidden_layers)
     # else this is not a valid mode
