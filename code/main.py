@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import argparse
 import os
 import cv2
-import re
+from sklearn.utils import shuffle
 import numpy as np
 
 
@@ -57,6 +57,13 @@ def display_images(image_data, image_label):
         plt.show()
 
 
+def shuffle_data(image_data, image_label):
+    # shuffles the data together
+    shuffled_image_data, shuffled_image_label = shuffle(
+        image_data, image_label)
+    return shuffled_image_data, shuffled_image_label
+
+
 def make_train_test_set(image_data, image_label):
     print("Make data")
 
@@ -83,8 +90,10 @@ if __name__ == '__main__':
     loaded_text_data = load_text_image_file(data_location)
     # loads the labels from the text files
     loaded_label_data = load_text_label_file(labels_location)
-    # print(data_location)
-    # print(labels_location)
+    # reshapes the data into a 28x28 array
     reshaped_text_data = reshape_image_data(loaded_text_data)
-    display_images(reshaped_text_data, loaded_label_data)
-    # print(reshaped_text_data)
+    # shuffles the data
+    loaded_text_data, loaded_label_data = shuffle_data(
+        reshaped_text_data, loaded_label_data)
+    # displays the images
+    display_images(loaded_text_data, loaded_label_data)
