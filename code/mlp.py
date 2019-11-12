@@ -1,6 +1,7 @@
 from layer import *
 
 import math
+import time
 
 
 class Multi_Layer_Perceptron:
@@ -37,8 +38,8 @@ class Multi_Layer_Perceptron:
 
             self.network_layers.append(
                 layer(self.neurons_in_each_layer[i], self.neurons_in_each_layer[i+1]))
-            self.network_layers.append(
-                sigmoid(self.neurons_in_each_layer[i+1]))
+            # self.network_layers.append(
+            #     sigmoid(self.neurons_in_each_layer[i+1]))
         # print(self.network_layers)
         # print(self.network_layers[0].__dict__)
 
@@ -62,36 +63,6 @@ class Multi_Layer_Perceptron:
 
     def adjust_prediction(self, predictions):
         adjusted_predictions = []
-        # print(predictions)
-        # print(len(predictions))
-        # quit()
-        # predictions = predictions[-1]
-        # print(predictions)
-        # #print("rows: ", np.size(predictions, 0))
-        # for item in predictions:
-        #     if item > 0.75:
-        #         adjusted_predictions.append(1)
-        #     elif item < 0.25:
-        #         adjusted_predictions.append(0)
-        #     else:
-        #         adjusted_predictions.append(item)
-
-        # print(item)
-        # print("cols: ", np.size(predictions, 1))
-
-        # #predictions = predictions[-1]
-        # print(np.size(predictions))
-        # for predict in predictions:
-        # for item in predict:
-        #     if item > 0.75:
-        #         adjusted_predictions.append(1)
-        #     elif item < 0.25:
-        #         adjusted_predictions.append(0)
-        #     else:
-        #         adjusted_predictions.append(item)
-        # print(adjusted_predictions[0])
-        # print(adjusted_predictions[-1])
-        # print(len(adjusted_predictions))
 
         for predict in predictions:
             if predict > 0.75:
@@ -105,24 +76,53 @@ class Multi_Layer_Perceptron:
     def calculate_loss(self, predictions, correct_labels):
         loss = 0
         correct_array = [0] * 10
+        correct_array[correct_labels] = 1
+        return_array = []
+        diff_array = []
+
         print("correct label: ", correct_labels)
         correct_array[correct_labels] = 1
         for i in range(len(predictions)):
             loss = loss + math.pow(correct_array[i] - predictions[i], 2)
         print("loss: ", loss)
-        print(len(predictions))
-        print(predictions)
+        # print(len(predictions))
+        # print(predictions)
+        # quit()
         return loss/len(predictions)
+        # for i in range(len(predictions)):
+        #     return_array.append(math.pow(predictions[i] - correct_array[i], 2))
+        # #return_array = math.pow(predictions - correct_array, 2)
+        # return return_array
+        # # print(return_array)
+        # # quit()
 
     def calculate_loss_gradient(self, loss):
-        return_value = loss * (1-loss)
-        return return_value
+        return_array = []
+        for i in range(len(loss)):
+            value = loss[i] * (1-loss[i])
+            return_array.append(value)
+        # return_value = loss * (1-loss)
+        print(return_array)
+
+        # quit()
+        return return_array
 
     def train(self, inputs, correct_class):
         layer_activations = self.feed_forward(inputs)
         print(len(layer_activations[-1]))
+        logits = layer_activations[-1]
+        # print(logits)
+        # loss = self.softmax_crossentropy_with_logits(logits, correct_class)
+        # loss_grad = self.grad_softmax_crossentropy_with_logits(
+        #  logits, correct_class)
+
         # quit()
         layer_inputs = [inputs] + layer_activations
+
+        # loss = self.softmax_crossentropy_with_logits(logits, correct_class)
+        # loss_grad = grad_softmax_crossentropy_with_logits(
+        #     logits, correct_class)
+
         # print(test)
         # print(layer_activations)
         # print(np.size(layer_activations))
@@ -135,14 +135,28 @@ class Multi_Layer_Perceptron:
         # make predictions
         predictions = self.make_prediction(inputs)
         predictions = self.adjust_prediction(predictions)
+        print(predictions)
+        # time.sleep(1)
         # get loss
         loss = self.calculate_loss(predictions, correct_class)
-        print(loss)
+        self.loss = loss
+        # print(loss)
         loss_gradient = self.calculate_loss_gradient(loss)
+        # loss_grad = sigmoid_derivative(loss)
 
-        for i in range(len(self.network_layers))[::-1]:
-            loss_gradient = self.network_layers[i].feed_backward(
-                layer_inputs[i], loss_gradient)
+        loss
+        # quit()
+        print("testing", np.shape(self.network_layers[-1].weights))
+
+        for layer_index in range(len(self.network_layers))[::-1]:
+            layer = self.network_layers[layer_index]
+
+            loss_grad = layer.feed_backward(
+                layer_inputs[layer_index], loss_grad)
+
+        # for i in range(len(self.network_layers))[::-1]:
+        #     loss_gradient = self.network_layers[i].feed_backward(
+        #         layer_inputs[i], loss_gradient)
 
     # def calculate_loss(self, predictions, correct_labels):
     #     correc_array = []
@@ -160,3 +174,21 @@ class Multi_Layer_Perceptron:
     # return loss
 
     # def check_predictions(labels):
+
+    def softmax_crossentropy_with_logits(self, logits, reference_answers):
+        # Compute crossentropy from logits[batch,n_classes] and ids of correct answers
+        logits_for_answers = logits[np.arange(len(logits)), reference_answers]
+
+        xentropy = - logits_for_answers + \
+            np.log(np.sum(np.exp(logits), axis=-1))
+
+        return xentropy
+
+    def grad_softmax_crossentropy_with_logits(self, logits, reference_answers):
+        # Compute crossentropy gradient from logits[batch,n_classes] and ids of correct answers
+        ones_for_answers = np.zeros_like(logits)
+        ones_for_answers[np.arange(len(logits)), reference_answers] = 1
+
+        softmax = np.exp(logits) / np.exp(logits).sum(axis=-1, keepdims=True)
+
+        return (- ones_for_answers + softmax) / logits.shape[0]

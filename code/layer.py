@@ -1,5 +1,6 @@
 from neuron import *
 import numpy as np
+from utils import *
 
 
 class layer:
@@ -13,7 +14,7 @@ class layer:
         self.set_weights()
         # sets the biases in the layer
         self.set_biases()
-        self.learning_rate = 0.01
+        self.learning_rate = 0.1
 
     def set_weights(self):
         # print("set weights")
@@ -21,7 +22,10 @@ class layer:
                                         scale=np.sqrt(
                                             2/(self.number_of_inputs+self.number_of_outputs)),
                                         size=(self.number_of_inputs, self.number_of_outputs))
-        #print("test", len(self.weights[0]))
+        # self.weights = np.random.randn(
+        #     self.number_of_inputs, self.number_of_outputs)
+
+        # print("test", len(self.weights[0]))
 
     def set_biases(self):
         self.biases = np.zeros(self.number_of_outputs)
@@ -29,33 +33,52 @@ class layer:
         # print(self.biases)
 
     def feed_forward(self, inputs):
-        return_values = np.dot(inputs, self.weights) + self.biases
+        return_values = sigmoid_function(
+            np.dot(inputs, self.weights) + self.biases)
         return return_values
 
-    def feed_backward(self, inputs, gradient_output):
+    def feed_backward(self, inputs, gradient):
+        print("test")
+        print(len(inputs))
+        # print(gradient)
         inputs = np.asarray(inputs)
-        grad_input = np.dot(gradient_output, self.weights.T)
-
-        # compute gradient w.r.t. weights and biases
-        # COME BACK
-        grad_weights = np.dot(inputs.T, gradient_output)
-        #grad_weights = np.dot(inputs, gradient_output)
-        grad_biases = gradient_output*inputs.shape[0]
-
-        print(np.shape(self.learning_rate))
-        print(np.shape(grad_weights))
+        gradient = np.mean(gradient)
+        error = np.dot(gradient, self.weights.T)
+        delta = error*sigmoid_derivative(error)
+        change_in_weights = []
+        for i in range(len(inputs)):
+            change_in_weights.append(inputs[i]*gradient)
+        print(np.shape(gradient))
         print(np.shape(self.weights))
-        quit()
+        self.weights = self.weights + \
+            self.learning_rate * change_in_weights
+        print(len(error))
+        print(len(delta))
+        return delta
 
-        # grad_biases = gradient_output.mean(axis=0)*inputs.shape[0]
+    # def feed_backward(self, inputs, gradient_output):
+    #     inputs = np.asarray(inputs)
+    #     grad_input = np.dot(gradient_output, self.weights.T)
 
-        #assert grad_weights.shape == self.weights.shape and grad_biases.shape == self.biases.shape
+    #     # compute gradient w.r.t. weights and biases
+    #     # COME BACK
+    #     # grad_weights = np.dot(inputs.T, gradient_output)
+    #     grad_weights = np.dot(inputs.T, gradient_output)
+    #     grad_biases = gradient_output*inputs.shape[0]
 
-        # Here we perform a stochastic gradient descent step.
-        self.weights = self.weights - self.learning_rate * grad_weights
-        self.biases = self.biases - self.learning_rate * grad_biases
+    #     print(np.shape(self.learning_rate))
+        # print(np.shape(grad_weights))
+        # print(np.shape(self.weights))
 
-        return grad_input
+    #     # grad_biases = gradient_output.mean(axis=0)*inputs.shape[0]
+
+    #     #assert grad_weights.shape == self.weights.shape and grad_biases.shape == self.biases.shape
+
+    #     # Here we perform a stochastic gradient descent step.
+    #     self.weights = self.weights - self.learning_rate * grad_weights
+    #     self.biases = self.biases - self.learning_rate * grad_biases
+
+    #     return grad_input
 
 
 class sigmoid:

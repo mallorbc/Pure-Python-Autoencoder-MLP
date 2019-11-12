@@ -1,6 +1,7 @@
 from utils import *
 from mlp import *
 
+import time
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -81,8 +82,12 @@ if __name__ == '__main__':
         hidden_layers = int(hidden_layers)
         mlp = Multi_Layer_Perceptron(
             network_input_size, network_output_size, hidden_layers)
-        for i in range(len(loaded_text_data)):
-            mlp.train(loaded_text_data[i], int(loaded_label_data[i]))
+        for j in range(100):
+            for i in range(len(loaded_text_data)):
+                mlp.train(loaded_text_data[i], int(loaded_label_data[i]))
+                print("train:", i)
+            print("loss:", mlp.loss)
+            time.sleep(1)
     # else this is not a valid mode
     else:
         raise SyntaxError("Not a valid run mode")

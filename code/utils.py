@@ -120,3 +120,11 @@ def confirm_or_deny():
         value = confirm_or_deny()
     value = int(value)
     return value
+
+
+def sigmoid_function(x):
+    return 1.0/(1 + np.exp(-x))
+
+
+def sigmoid_derivative(x):
+    return x * (1.0 - x)
