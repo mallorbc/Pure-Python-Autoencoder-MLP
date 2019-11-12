@@ -13,6 +13,7 @@ class layer:
         self.set_weights()
         # sets the biases in the layer
         self.set_biases()
+        self.learning_rate = 0.01
 
     def set_weights(self):
         # print("set weights")
@@ -32,11 +33,21 @@ class layer:
         return return_values
 
     def feed_backward(self, inputs, gradient_output):
+        inputs = np.asarray(inputs)
         grad_input = np.dot(gradient_output, self.weights.T)
 
         # compute gradient w.r.t. weights and biases
+        # COME BACK
         grad_weights = np.dot(inputs.T, gradient_output)
-        grad_biases = gradient_output.mean(axis=0)*inputs.shape[0]
+        #grad_weights = np.dot(inputs, gradient_output)
+        grad_biases = gradient_output*inputs.shape[0]
+
+        print(np.shape(self.learning_rate))
+        print(np.shape(grad_weights))
+        print(np.shape(self.weights))
+        quit()
+
+        # grad_biases = gradient_output.mean(axis=0)*inputs.shape[0]
 
         #assert grad_weights.shape == self.weights.shape and grad_biases.shape == self.biases.shape
 

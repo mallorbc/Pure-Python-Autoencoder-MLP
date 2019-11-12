@@ -62,43 +62,56 @@ class Multi_Layer_Perceptron:
 
     def adjust_prediction(self, predictions):
         adjusted_predictions = []
-        print(len(predictions))
-        quit()
-        predictions = predictions[-1]
-        print(predictions)
-        #print("rows: ", np.size(predictions, 0))
-        for item in predictions:
-            if item > 0.75:
-                adjusted_predictions.append(1)
-            elif item < 0.25:
-                adjusted_predictions.append(0)
-            else:
-                adjusted_predictions.append(item)
-            # print(item)
+        # print(predictions)
+        # print(len(predictions))
+        # quit()
+        # predictions = predictions[-1]
+        # print(predictions)
+        # #print("rows: ", np.size(predictions, 0))
+        # for item in predictions:
+        #     if item > 0.75:
+        #         adjusted_predictions.append(1)
+        #     elif item < 0.25:
+        #         adjusted_predictions.append(0)
+        #     else:
+        #         adjusted_predictions.append(item)
+
+        # print(item)
         # print("cols: ", np.size(predictions, 1))
 
         # #predictions = predictions[-1]
         # print(np.size(predictions))
         # for predict in predictions:
-        #     for item in predict:
-                # if item > 0.75:
-                #     adjusted_predictions.append(1)
-                # elif item < 0.25:
-                #     adjusted_predictions.append(0)
-                # else:
-                #     adjusted_predictions.append(item)
+        # for item in predict:
+        #     if item > 0.75:
+        #         adjusted_predictions.append(1)
+        #     elif item < 0.25:
+        #         adjusted_predictions.append(0)
+        #     else:
+        #         adjusted_predictions.append(item)
         # print(adjusted_predictions[0])
         # print(adjusted_predictions[-1])
         # print(len(adjusted_predictions))
+
+        for predict in predictions:
+            if predict > 0.75:
+                adjusted_predictions.append(1)
+            elif predict < 0.25:
+                adjusted_predictions.append(0)
+            else:
+                adjusted_predictions.append(predict)
         return adjusted_predictions
-        # quit()
 
     def calculate_loss(self, predictions, correct_labels):
+        loss = 0
         correct_array = [0] * 10
-        print(correct_labels)
+        print("correct label: ", correct_labels)
         correct_array[correct_labels] = 1
         for i in range(len(predictions)):
             loss = loss + math.pow(correct_array[i] - predictions[i], 2)
+        print("loss: ", loss)
+        print(len(predictions))
+        print(predictions)
         return loss/len(predictions)
 
     def calculate_loss_gradient(self, loss):
@@ -106,6 +119,19 @@ class Multi_Layer_Perceptron:
         return return_value
 
     def train(self, inputs, correct_class):
+        layer_activations = self.feed_forward(inputs)
+        print(len(layer_activations[-1]))
+        # quit()
+        layer_inputs = [inputs] + layer_activations
+        # print(test)
+        # print(layer_activations)
+        # print(np.size(layer_activations))
+        # print(len(layer_activations[0]))
+        # print((len(layer_activations[1])))
+        # print((len(layer_activations[2])))
+        # print((len(layer_activations[3])))
+
+        # quit()
         # make predictions
         predictions = self.make_prediction(inputs)
         predictions = self.adjust_prediction(predictions)
@@ -114,9 +140,9 @@ class Multi_Layer_Perceptron:
         print(loss)
         loss_gradient = self.calculate_loss_gradient(loss)
 
-        for current_layer in self.network_layers:
-            loss_gradient = current_layer.feed_backward(
-                current_layer.weights, loss_gradient)
+        for i in range(len(self.network_layers))[::-1]:
+            loss_gradient = self.network_layers[i].feed_backward(
+                layer_inputs[i], loss_gradient)
 
     # def calculate_loss(self, predictions, correct_labels):
     #     correc_array = []
