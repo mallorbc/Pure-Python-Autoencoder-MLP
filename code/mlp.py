@@ -48,7 +48,8 @@ class Multi_Layer_Perceptron:
             layer_outputs.append(current_layer.feed_forward(inputs))
             # grabs the last layer of outputs
             inputs = layer_outputs[-1]
-
+            # print(len(inputs))
+        # print(np.size(np.asarray(layer_outputs)))
         return layer_outputs
 
     def make_prediction(self, inputs):
@@ -61,20 +62,40 @@ class Multi_Layer_Perceptron:
 
     def adjust_prediction(self, predictions):
         adjusted_predictions = []
-        print(np.size(predictions))
-        for predict in predictions:
-            print(len(predict))
-            quit()
-            if predict > 0.75:
+        print(len(predictions))
+        quit()
+        predictions = predictions[-1]
+        print(predictions)
+        #print("rows: ", np.size(predictions, 0))
+        for item in predictions:
+            if item > 0.75:
                 adjusted_predictions.append(1)
-            elif predict < 0.25:
+            elif item < 0.25:
                 adjusted_predictions.append(0)
             else:
-                adjusted_predictions.append(predict)
+                adjusted_predictions.append(item)
+            # print(item)
+        # print("cols: ", np.size(predictions, 1))
+
+        # #predictions = predictions[-1]
+        # print(np.size(predictions))
+        # for predict in predictions:
+        #     for item in predict:
+                # if item > 0.75:
+                #     adjusted_predictions.append(1)
+                # elif item < 0.25:
+                #     adjusted_predictions.append(0)
+                # else:
+                #     adjusted_predictions.append(item)
+        # print(adjusted_predictions[0])
+        # print(adjusted_predictions[-1])
+        # print(len(adjusted_predictions))
         return adjusted_predictions
+        # quit()
 
     def calculate_loss(self, predictions, correct_labels):
         correct_array = [0] * 10
+        print(correct_labels)
         correct_array[correct_labels] = 1
         for i in range(len(predictions)):
             loss = loss + math.pow(correct_array[i] - predictions[i], 2)
@@ -89,9 +110,9 @@ class Multi_Layer_Perceptron:
         predictions = self.make_prediction(inputs)
         predictions = self.adjust_prediction(predictions)
         # get loss
-        loss = calculate_loss(predictions, correct_class)
+        loss = self.calculate_loss(predictions, correct_class)
         print(loss)
-        loss_gradient = calculate_loss_gradient(loss)
+        loss_gradient = self.calculate_loss_gradient(loss)
 
         for current_layer in self.network_layers:
             loss_gradient = current_layer.feed_backward(

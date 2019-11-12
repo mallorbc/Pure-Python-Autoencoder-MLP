@@ -81,9 +81,8 @@ if __name__ == '__main__':
         hidden_layers = int(hidden_layers)
         mlp = Multi_Layer_Perceptron(
             network_input_size, network_output_size, hidden_layers)
-
         for i in range(len(loaded_text_data)):
-            mlp.train(loaded_text_data, loaded_label_data)
+            mlp.train(loaded_text_data[i], int(loaded_label_data[i]))
     # else this is not a valid mode
     else:
         raise SyntaxError("Not a valid run mode")
