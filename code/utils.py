@@ -123,7 +123,13 @@ def confirm_or_deny():
 
 
 def sigmoid_function(x):
-    return 1.0/(1 + np.exp(-x))
+    sigmoid_array = []
+    for item in x:
+        sigmoid_array.append(1.0/(1 + np.exp(-item)))
+    # print(len(sigmoid_array))
+    sigmoid_array = np.asarray(sigmoid_array)
+    # print(sigmoid_array)
+    return sigmoid_array
 
 
 def sigmoid_derivative(x):
