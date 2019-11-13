@@ -37,15 +37,8 @@ class Dense(Layer):
         self.learning_rate = 0.1
 
     def set_weights(self):
-        # print("set weights")
-        # self.weights = np.random.normal(loc=0.0,
-        #                                 scale=np.sqrt(
-        #                                     2/(self.number_of_inputs+self.number_of_outputs)),
-        #                                 size=(self.number_of_inputs, self.number_of_outputs))
         self.weights = np.random.randn(
             self.number_of_inputs, self.number_of_outputs)*0.01
-        # print(self.weights)
-        # quit()
 
     def set_biases(self):
         self.biases = np.zeros(self.number_of_outputs)
@@ -93,33 +86,3 @@ class sigmoid_layer(Layer):
         return_value = fx * (1-fx)
         return_value = return_value * gradient_output
         return return_value
-
-
-# class softmax_layer(Layer):
-#     def __init__(self):
-#         # self.number_of_inputs = inputs
-#         pass
-
-#     def forward(self, inputs):
-#         return_value = softmax(inputs)
-#         return return_value
-
-#     def backward(self, inputs, gradient_output):
-#         s = inputs.reshape(-1, 1)
-#         s = np.diagflat(s) - np.dot(s, s.T)
-#         return gradient_output*s
-
-
-class relu:
-    def __init__(self):
-        # self.number_of_inputs = inputs
-        pass
-
-    def forward(self, input):
-        """Apply elementwise ReLU to [batch, input_units] matrix"""
-        return np.maximum(0, input)
-
-    def backward(self, input, grad_output):
-        """Compute gradient of loss w.r.t. ReLU input"""
-        relu_grad = input > 0
-        return grad_output*relu_grad

@@ -16,21 +16,29 @@ def adjust_prediction(predictions):
         second_dim = predictions.shape[1]
 
         for i in range(len(predictions)):
+            largest = max(predictions[i])
+            # print(largest)
             for j in range(len(predictions[i])):
-                if predictions[i][j] > 0.9:
-                    return_batch.append(1)
-                elif predictions[i][j] < 0.25:
+
+                # if predictions[i][j] > 0.9:
+                #     return_batch.append(1)
+                if predictions[i][j] < largest:
                     return_batch.append(0)
+                elif predictions[i][j] == largest:
+                    return_batch.append(1)
                 else:
                     return_batch.append(predictions[i][j])
         return_batch = np.asarray(return_batch)
         return_batch = return_batch.reshape(first_dim, second_dim)
     else:
+        largest = max(predictions)
         for predict in predictions:
-            if predict > 0.75:
-                return_batch.append(1)
-            elif predict < 0.25:
+            # if predict > 0.75:
+            #     return_batch.append(1)
+            if predict < largest:
                 return_batch.append(0)
+            elif predict == largest:
+                return_batch.append(1)
             else:
                 return_batch.append(predict)
         return_batch = np.asarray(return_batch)
@@ -48,49 +56,14 @@ def get_accuracy(predictions, actual_results):
 
 
 def grad_loss(logits, reference_answers):
-
+    # finds the errors and passes it to each layer
     ones_for_answers = np.zeros_like(logits)
     ones_for_answers[np.arange(len(logits)), reference_answers] = 1
-    # print("reference answers: ", reference_answers)
-    # quit()
-    # print("logits: ", logits)
-    # print("ones_for_answers: ", ones_for_answers)
-    # quit()
 
     softmax = np.exp(logits) / np.exp(logits).sum(axis=-1, keepdims=True)
-    # print(np.shape(softmax))
-    # quit()
-
-    # print("ones_for_answers: ", ones_for_answers)
-    # print(logits.shape[0])
-    # print(softmax)
-    # quit()
 
     return_value = (- ones_for_answers + softmax) / logits.shape[0]
 
-    # ones_for_answers = np.zeros_like(logits)
-    # ones_for_answers[np.arange(len(logits)), reference_answers] = 1
-
-    # g = 1.0 / (1.0 + np.exp(-logits)).sum(axis=-1, keepdims=True)
-    # g = 1.0 / (1.0 + np.exp(-logits))
-    # # print(np.shape(g))
-    # sigmoid = g*(1-g)
-    # # print(np.shape(sigmoid))
-    # # quit()
-    # return_value = (-1*(ones_for_answers + sigmoid) / logits.shape[0])
-
-    # #print("grad: ", np.shape(return_value))
-    # # quit()
-    # return return_value
-    # print(np.shape(loss))
-    # quit()
-    # gradient = np.dot(logits.T, loss)/len(loss)
-    # print("grad: ", np.shape(gradient))
-    # quit()
-    # return gradient*-1
-    # print(gradient)
-    # quit()
-    # grad_array = []
     return return_value
 
 
@@ -189,10 +162,11 @@ def predict(network, X, display):
     Compute network predictions.
     """
     logits = forward(network, X)[-1]
+
+    logits = adjust_prediction(logits)
     if display:
         print(logits)
-        time.sleep(5)
-    # logits = adjust_prediction(logits)
+        time.sleep(1)
     return logits.argmax(axis=-1)
 
 
@@ -208,7 +182,7 @@ def train(network, X, y):
     # Get the layer activations
     layer_activations = forward(network, X)
     logits = layer_activations[-1]
-    # logits = adjust_prediction(logits)
+    logits = adjust_prediction(logits)
     # print("logits shape: ", np.shape(logits))
     # quit()
 
@@ -317,10 +291,10 @@ if __name__ == '__main__':
         hidden_layers = int(hidden_layers)
 
         network = []
-        network.append(Dense(network_input_size, 200))
+        network.append(Dense(network_input_size, 100))
         network.append(sigmoid_layer())
-        network.append(Dense(200, 100))
-        network.append(sigmoid_layer())
+        # network.append(Dense(200, 100))
+        # network.append(sigmoid_layer())
         network.append(Dense(100, 10))
         # network.append(softmax_layer())
 
@@ -336,7 +310,7 @@ if __name__ == '__main__':
             # print("data:", np.shape(loaded_text_data))
             # print("labels", np.shape(loaded_label_data))
             # quit()
-            for x_batch, y_batch in iterate_minibatches(loaded_text_data, loaded_label_data, batchsize=128, shuffle=True):
+            for x_batch, y_batch in iterate_minibatches(loaded_text_data, loaded_label_data, batchsize=1024, shuffle=True):
                 # print("input shape: ", np.shape(x_batch))
                 # quit()
                 # print(y_batch)
@@ -345,7 +319,7 @@ if __name__ == '__main__':
                 # time.sleep(1)
                 # if epoch % 10 == 0:
                 #     print("loss: ", loss, "epoch: ", epoch)
-                if epoch % 100 == 0:
+                if epoch % 250 == 0:
                     for i in range(len(x_batch)):
                         prediction_array.append(
                             (predict(network, x_batch[i], display)))
@@ -353,13 +327,14 @@ if __name__ == '__main__':
                         actual_outputs_array.append(y_batch[i])
                     print("accuracy: ", get_accuracy(
                         prediction_array, actual_outputs_array), " epoch: ", epoch)
+                    print("loss:", loss)
                     prediction_array.clear()
                     actual_outputs_array.clear()
                     # output = predict(network, x_batch[0])
                     # print("Predicted: ", output)
                     # print("Actual: ", y_batch[0])
 
-                    time.sleep(2)
+                    time.sleep(1)
                     break
 
     else:
