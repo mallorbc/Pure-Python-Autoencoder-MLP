@@ -2,9 +2,10 @@ import numpy as np
 import math
 import time
 from layer import *
+import os
 
 
-def make_network():
+def make_network(weights_to_load=None):
     network = []
     network_input_size = input("How many inputs does the network have? ")
     network_output_size = input("How many outputs does the network have? ")
@@ -14,23 +15,56 @@ def make_network():
     hidden_layers = int(hidden_layers)
     total_layers = 2 + hidden_layers
     hidden_layer_sizes = []
-    # builds the network
-    for i in range(hidden_layers):
-        layer_number = i + 1
-        layer_sizes = input(
-            f"how many neurons for hidden layer #{layer_number}?: ")
-        layer_sizes = int(layer_sizes)
-        hidden_layer_sizes.append(layer_sizes)
-    network.append(Dense(network_input_size, hidden_layer_sizes[0]))
-    network.append(sigmoid_layer())
-    for i in range(len(hidden_layer_sizes)):
-        if i == (len(hidden_layer_sizes)-1):
-            network.append(Dense(hidden_layer_sizes[0], network_output_size))
-            network.append(sigmoid_layer())
-        else:
-            network.append(
-                Dense(hidden_layer_sizes[i], hidden_layer_sizes[i+1]))
-            network.append(sigmoid_layer())
+    if weights_to_load is None:
+        # builds the network
+        for i in range(hidden_layers):
+            layer_number = i + 1
+            layer_sizes = input(
+                f"how many neurons for hidden layer #{layer_number}?: ")
+            layer_sizes = int(layer_sizes)
+            hidden_layer_sizes.append(layer_sizes)
+        network.append(Dense(network_input_size, hidden_layer_sizes[0]))
+        network.append(sigmoid_layer())
+        for i in range(len(hidden_layer_sizes)):
+            if i == (len(hidden_layer_sizes)-1):
+                network.append(
+                    Dense(hidden_layer_sizes[0], network_output_size))
+                network.append(sigmoid_layer())
+            else:
+                network.append(
+                    Dense(hidden_layer_sizes[i], hidden_layer_sizes[i+1]))
+                network.append(sigmoid_layer())
+
+    else:
+        # gets the full path of the weights
+        full_path_weights = []
+        weights = os.listdir(weights_to_load)
+        for weight in weights:
+            temp_path = weights_to_load + weight
+            full_path_weights.append(os.path.realpath(temp_path))
+
+        weights = full_path_weights
+
+        # print(weights)
+        # quit()
+        for i in range(hidden_layers):
+            layer_number = i + 1
+            layer_sizes = input(
+                f"how many neurons for hidden layer #{layer_number}?: ")
+            layer_sizes = int(layer_sizes)
+            hidden_layer_sizes.append(layer_sizes)
+        network.append(
+            Dense(network_input_size, hidden_layer_sizes[0], weights[0]))
+        network.append(sigmoid_layer())
+        for i in range(len(hidden_layer_sizes)):
+            if i == (len(hidden_layer_sizes)-1):
+                network.append(
+                    Dense(hidden_layer_sizes[i], network_output_size, weights[i+1]))
+                network.append(sigmoid_layer())
+            else:
+                network.append(
+                    Dense(hidden_layer_sizes[i], hidden_layer_sizes[i+1], weights[i+1]))
+                network.append(sigmoid_layer())
     # returns the built network
     return network
 
@@ -123,7 +157,6 @@ def calculate_loss(predictions, correct_labels):
 
 
 def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
-    assert len(inputs) == len(targets)
     if shuffle:
         indices = np.random.permutation(len(inputs))
     for start_idx in range(0, len(inputs) - batchsize + 1, batchsize):
@@ -134,55 +167,56 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
         yield inputs[excerpt], targets[excerpt]
 
 
-def forward(network, X):
-    """
-    Compute activations of all network layers by applying them sequentially.
-    Return a list of activations for each layer.
-    Make sure last activation corresponds to network logits.
-    """
+def feed_forward(network, X):
+    # calcultes each layers activations and passes them forward
     activations = []
-    input = X
+    # passes the inputs through the network
     for i in range(len(network)):
-        activations.append(network[i].forward(X))
-        X = network[i].forward(X)
+        activations.append(network[i].feed_forward(X))
+        X = network[i].feed_forward(X)
 
-    assert len(activations) == len(network)
     return activations
 
 
 def predict(network, X, display):
-    """
-    Compute network predictions.
-    """
-    logits = forward(network, X)[-1]
-
-    logits = adjust_prediction(logits)
+    # feeds forward and grabs the last layer
+    predictions = feed_forward(network, X)[-1]
+    # adjusts the predictions
+   # predictions = adjust_prediction(predictions)
+    # displays the predictions outputs
     if display:
-        print(logits)
-        time.sleep(1)
-    return logits.argmax(axis=-1)
+        print(predictions)
+    # returns the highest value
+    return predictions.argmax(axis=-1)
 
 
 def train(network, X, y):
-    """
-    Train your network on a given batch of X and y.
-    You first need to run forward to get all layer activations.
-    Then you can run layer.backward going from last to first layer.
-    After you called backward for all layers, all Dense layers have already made one gradient step.
-    """
+    # passes all inputs through the network
+    layer_activations = feed_forward(network, X)
+    final_outputs = layer_activations[-1]
+    # adjust the predictions based on thresholds
+    # final_outputs = adjust_prediction(final_outputs)
+    # calculates the loss
+    loss = calculate_loss(final_outputs, y)
 
-    # Get the layer activations
-    layer_activations = forward(network, X)
-    logits = layer_activations[-1]
-    logits = adjust_prediction(logits)
-    # loss = softmax_crossentropy_with_logits(logits, y)
-    loss = calculate_loss(logits, y)
+    loss_grad = grad_loss(final_outputs, y)
 
-    # loss_grad = grad_softmax_crossentropy_with_logits(logits, y)
-    loss_grad = grad_loss(logits, y)
-
+    # does backpropogation
     for i in range(1, len(network)):
         loss_grad = network[len(
-            network) - i].backward(layer_activations[len(network) - i - 1], loss_grad)
-
+            network) - i].feed_backward(layer_activations[len(network) - i - 1], loss_grad)
+    # retunrs the loss
     return np.mean(loss)
+
+
+def save_weights(network, output_dir):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    weights = []
+    for i in range(len(network)):
+        if i % 2 == 0:
+            weights.append(network[i].save_weights())
+
+    for i in range(len(weights)):
+        file_dir = output_dir + "/" + str(i) + ".npy"
+        np.save(file_dir, weights[i])

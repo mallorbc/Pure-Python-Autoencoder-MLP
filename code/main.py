@@ -1,5 +1,4 @@
 from utils import *
-from mlp import *
 from tqdm import trange
 
 import math
@@ -20,12 +19,15 @@ if __name__ == '__main__':
                         help="Where the file for the labels is; Will be either a txt file or a csv file", type=str)
     parser.add_argument("-o", "--output_dir", default="../hw_files/output",
                         help="The directory that will contain any generated files", type=str)
+    parser.add_argument(
+        "-ld", "--load", help="directory containing weights to load", default=None, type=str)
     # parses the arguments
     args = parser.parse_args()
     mode = args.mode
     data_location = args.data
     labels_location = args.labels
     output_dir = args.output_dir
+    weights_to_load = args.load
 
     # gets the full path of the output
     output_dir = os.path.realpath(output_dir)
@@ -77,7 +79,11 @@ if __name__ == '__main__':
 
     # this is the mode that creates the MLP
     elif mode == 3:
-        network = make_network()
+        if weights_to_load is not None:
+            # print("wrong")
+            network = make_network(weights_to_load)
+        else:
+            network = make_network()
 
         # converts the data to integers
         loaded_label_data = [int(i) for i in loaded_label_data]
@@ -86,21 +92,19 @@ if __name__ == '__main__':
 
         prediction_array = []
         actual_outputs_array = []
+        check_point = "checkpoint"
+        counter = 0
         for epoch in range(100000):
             display = True
-            # print("data:", np.shape(loaded_text_data))
-            # print("labels", np.shape(loaded_label_data))
-            # quit()
             for x_batch, y_batch in iterate_minibatches(loaded_text_data, loaded_label_data, batchsize=1024, shuffle=True):
-                # print("input shape: ", np.shape(x_batch))
-                # quit()
-                # print(y_batch)
-                # quit()
                 loss = train(network, x_batch, y_batch)
                 # time.sleep(1)
                 # if epoch % 10 == 0:
                 #     print("loss: ", loss, "epoch: ", epoch)
                 if epoch % 250 == 0:
+                    counter = counter + 1
+                    check_point_dir = check_point + str(epoch)
+                    new_output_dir = output_dir + "/" + check_point_dir
                     for i in range(len(x_batch)):
                         prediction_array.append(
                             (predict(network, x_batch[i], display)))
@@ -109,6 +113,7 @@ if __name__ == '__main__':
                     print("accuracy: ", get_accuracy(
                         prediction_array, actual_outputs_array), " epoch: ", epoch)
                     print("loss:", loss)
+                    save_weights(network, new_output_dir)
                     prediction_array.clear()
                     actual_outputs_array.clear()
                     # output = predict(network, x_batch[0])
