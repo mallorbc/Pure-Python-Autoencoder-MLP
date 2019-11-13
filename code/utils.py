@@ -134,3 +134,9 @@ def sigmoid_function(x):
 
 def sigmoid_derivative(x):
     return x * (1.0 - x)
+
+
+def softmax_function(x):
+    """Compute softmax values for each sets of scores in x."""
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum(axis=0)  # only difference

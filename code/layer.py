@@ -59,10 +59,7 @@ class Dense(Layer):
         return return_value
 
     def backward(self, input, grad_output):
-        # print(grad_output)
-        # time.sleep(1)
-        # print(np.shape(input))
-        # time.sleep(1)
+
         grad_input = np.dot(grad_output, np.transpose(self.weights))
 
         # compute gradient w.r.t. weights and biases
@@ -88,22 +85,8 @@ class sigmoid_layer(Layer):
     def backward(self, inputs, gradient_output):
         g = 1.0 / (1.0 + np.exp(-inputs))
         g = g*(1-g)
-        # print(np.shape(g))
-        # time.sleep(1)
-        # quit()
-        return g
-        # return g*gradient_output
-        # return_value = inputs * (1-inputs)
-        # #print("return_value:", return_value)
-        # # quit()
-        # if math.isnan(return_value[0][0]):
-        #     print("inputs:", inputs)
-        #     print("grad_output:", gradient_output)
 
-        #     quit()
-        # #return_value = gradient_output*return_value
-        # # print(return_value)
-        # return return_value
+        return g
 
 
 class relu:
