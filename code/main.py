@@ -6,210 +6,7 @@ import math
 
 import time
 from layer import *
-
-
-def adjust_prediction(predictions):
-
-    return_batch = []
-    if predictions.ndim == 2:
-        first_dim = predictions.shape[0]
-        second_dim = predictions.shape[1]
-
-        for i in range(len(predictions)):
-            largest = max(predictions[i])
-            # print(largest)
-            for j in range(len(predictions[i])):
-
-                # if predictions[i][j] > 0.9:
-                #     return_batch.append(1)
-                if predictions[i][j] < largest:
-                    return_batch.append(0)
-                elif predictions[i][j] == largest:
-                    return_batch.append(1)
-                else:
-                    return_batch.append(predictions[i][j])
-        return_batch = np.asarray(return_batch)
-        return_batch = return_batch.reshape(first_dim, second_dim)
-    else:
-        largest = max(predictions)
-        for predict in predictions:
-            # if predict > 0.75:
-            #     return_batch.append(1)
-            if predict < largest:
-                return_batch.append(0)
-            elif predict == largest:
-                return_batch.append(1)
-            else:
-                return_batch.append(predict)
-        return_batch = np.asarray(return_batch)
-
-    return return_batch
-
-
-def get_accuracy(predictions, actual_results):
-    total = len(predictions)
-    number_correct = 0
-    for i in range(len(predictions)):
-        if predictions[i] == actual_results[i]:
-            number_correct = number_correct + 1
-    return number_correct/total
-
-
-def grad_loss(logits, reference_answers):
-    # finds the errors and passes it to each layer
-    ones_for_answers = np.zeros_like(logits)
-    ones_for_answers[np.arange(len(logits)), reference_answers] = 1
-
-    softmax = np.exp(logits) / np.exp(logits).sum(axis=-1, keepdims=True)
-
-    return_value = (- ones_for_answers + softmax) / logits.shape[0]
-
-    return return_value
-
-
-def calculate_loss(predictions, correct_labels):
-    loss_array = []
-    loss = 0
-    correct_array = [0] * 10
-    correct_array[correct_labels[0]] = 1
-    # print("predictions shape:", np.shape(predictions))
-    # print("correct labels shape:", np.shape(correct_labels))
-    # print(predictions[0])
-    # print(correct_labels[0])
-    # print(correct_array)
-    # quit()
-
-    for i in range(len(correct_labels)):
-        correct_array = [0] * 10
-        correct_array[correct_labels[i]] = 1
-        for j in range(len(predictions[i])):
-            # loss = 0
-            loss = loss + math.pow(predictions[i][j] - correct_array[j], 2)
-            # print(j)
-        loss_array.append(loss)
-        loss = 0
-
-        correct_array.clear()
-
-    loss_array = np.asarray(loss_array)
-    # print(loss_array)
-    # print(np.shape(loss_array))
-    # quit()
-    # print("loss:", np.shape(loss_array))
-    # quit()
-    return loss_array
-
-    # print("correct label: ", correct_labels)
-    # correct_array[correct_labels] = 1
-    # for i in range(len(predictions)):
-    #     loss = loss + math.pow(correct_array[i] - predictions[i], 2)
-    # print("loss: ", loss)
-    # # print(len(predictions))
-    # # print(predictions)
-    # # quit()
-    # return loss/len(predictions)
-
-
-def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
-    assert len(inputs) == len(targets)
-    if shuffle:
-        indices = np.random.permutation(len(inputs))
-    for start_idx in range(0, len(inputs) - batchsize + 1, batchsize):
-        if shuffle:
-            excerpt = indices[start_idx:start_idx + batchsize]
-        else:
-            excerpt = slice(start_idx, start_idx + batchsize)
-        yield inputs[excerpt], targets[excerpt]
-
-
-def softmax_crossentropy_with_logits(logits, reference_answers):
-    """Compute crossentropy from logits[batch,n_classes] and ids of correct answers"""
-    logits_for_answers = logits[np.arange(len(logits)), reference_answers]
-
-    xentropy = - logits_for_answers + np.log(np.sum(np.exp(logits), axis=-1))
-
-    return xentropy
-
-
-def grad_softmax_crossentropy_with_logits(logits, reference_answers):
-    """Compute crossentropy gradient from logits[batch,n_classes] and ids of correct answers"""
-    ones_for_answers = np.zeros_like(logits)
-    ones_for_answers[np.arange(len(logits)), reference_answers] = 1
-
-    softmax = np.exp(logits) / np.exp(logits).sum(axis=-1, keepdims=True)
-
-    return (- ones_for_answers + softmax) / logits.shape[0]
-
-
-def forward(network, X):
-    """
-    Compute activations of all network layers by applying them sequentially.
-    Return a list of activations for each layer.
-    Make sure last activation corresponds to network logits.
-    """
-    activations = []
-    input = X
-    for i in range(len(network)):
-        activations.append(network[i].forward(X))
-        X = network[i].forward(X)
-
-    assert len(activations) == len(network)
-    return activations
-
-
-def predict(network, X, display):
-    """
-    Compute network predictions.
-    """
-    logits = forward(network, X)[-1]
-
-    logits = adjust_prediction(logits)
-    if display:
-        print(logits)
-        time.sleep(1)
-    return logits.argmax(axis=-1)
-
-
-def train(network, X, y):
-    """
-    Train your network on a given batch of X and y.
-    You first need to run forward to get all layer activations.
-    Then you can run layer.backward going from last to first layer.
-    After you called backward for all layers, all Dense layers have already made one gradient step.
-    """
-    # print("input shape: ", np.shape(X))
-    # quit()
-    # Get the layer activations
-    layer_activations = forward(network, X)
-    logits = layer_activations[-1]
-    logits = adjust_prediction(logits)
-    # print("logits shape: ", np.shape(logits))
-    # quit()
-
-    # Compute the loss and the initial gradient
-    # loss = softmax_crossentropy_with_logits(logits, y)
-    loss = calculate_loss(logits, y)
-    # print("loss: ", loss)
-    # print("loss_shape", np.shape(loss))
-    # loss_grad = grad_softmax_crossentropy_with_logits(logits, y)
-    loss_grad = grad_loss(logits, y)
-    # print(np.shape(loss_grad))
-    # quit()
-    # print(np.shape(loss_grad))
-    # quit()
-    # layer_activations = np.asarray(layer_activations)
-    # print(np.shape(layer_activations))
-    # quit()
-    for i in range(1, len(network)):
-        # print(layer_activations)
-        # quit()
-        loss_grad = network[len(
-            network) - i].backward(layer_activations[len(network) - i - 1], loss_grad)
-        # print(loss_grad)
-        # time.sleep(1)
-        # quit()
-
-    return np.mean(loss)
+from networks import *
 
 
 if __name__ == '__main__':
@@ -224,6 +21,8 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--output_dir", default="../hw_files/output",
                         help="The directory that will contain any generated files", type=str)
     # parses the arguments
+    make_network()
+    quit()
     args = parser.parse_args()
     mode = args.mode
     data_location = args.data
@@ -290,13 +89,7 @@ if __name__ == '__main__':
         network_output_size = int(network_output_size)
         hidden_layers = int(hidden_layers)
 
-        network = []
-        network.append(Dense(network_input_size, 100))
-        network.append(sigmoid_layer())
-        # network.append(Dense(200, 100))
-        # network.append(sigmoid_layer())
-        network.append(Dense(100, 10))
-        # network.append(softmax_layer())
+        network = make_network()
 
         # converts the data to integers
         loaded_label_data = [int(i) for i in loaded_label_data]

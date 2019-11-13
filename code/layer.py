@@ -44,15 +44,8 @@ class Dense(Layer):
         self.biases = np.zeros(self.number_of_outputs)
 
     def forward(self, inputs):
-        # return_values = sigmoid_function(
-        #     np.dot(inputs, self.weights) + self.biases)
-        # return return_values
         return_value = np.matmul(inputs, self.weights) + self.biases
-        # return_value = sigmoid_function(return_value)
-        #return_value = softmax_function(return_value)
 
-        #print("forward_return_value", np.shape(return_value))
-        # time.sleep(1)
         return return_value
 
     def backward(self, input, grad_output):
@@ -73,7 +66,7 @@ class Dense(Layer):
 class sigmoid_layer(Layer):
     def __init__(self):
         # self.number_of_inputs = inputs
-        pass
+        print("Sigmoid layer added")
 
     def forward(self, inputs):
         # print(len(inputs))
