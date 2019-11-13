@@ -6,9 +6,12 @@ import math
 import time
 from layer import *
 from networks import *
+from datetime import datetime
 
 
 if __name__ == '__main__':
+    now = datetime.now()
+    dt_string = now.strftime("%m-%d-%H-%M-%S")
     parser = argparse.ArgumentParser(
         description="Command line tool for running HW3 for Intelligent Systems")
     parser.add_argument("-m", "--mode", default=1,
@@ -28,6 +31,10 @@ if __name__ == '__main__':
     labels_location = args.labels
     output_dir = args.output_dir
     weights_to_load = args.load
+
+    output_dir = output_dir + "/" + dt_string
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
     # gets the full path of the output
     output_dir = os.path.realpath(output_dir)
@@ -92,7 +99,8 @@ if __name__ == '__main__':
 
         prediction_array = []
         actual_outputs_array = []
-        check_point = "checkpoint"
+        check_point = "checkpoints/checkpoint"
+        graph_dir = "graphs"
         counter = 0
         for epoch in range(100000):
             display = True

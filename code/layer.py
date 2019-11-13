@@ -22,15 +22,17 @@ class Dense(Layer):
         # sets the weights for the network
         if weights_to_load is None:
             self.set_weights()
-            print(self.weights)
+            # print(self.weights)
 
         else:
             self.load_weights(weights_to_load)
-            print(self.weights)
+            # print(self.weights)
 
         # sets the biases in the layer
         self.set_biases()
         self.learning_rate = 0.1
+        self.momentum = 0.1
+        self.previous_weight_change = 0
 
     def set_weights(self):
         self.weights = np.random.randn(
@@ -52,7 +54,11 @@ class Dense(Layer):
         grad_biases = np.sum(grad_output, axis=0)
 
         # gradient descent step.
-        self.weights = self.weights - self.learning_rate * grad_weights
+        weight_change = (self.momentum * self.previous_weight_change) + \
+            (self.learning_rate * grad_weights)
+        self.weights = self.weights - weight_change
+        # updates old weight change for momentum
+        self.previous_weight_change = weight_change
         self.biases = self.biases - self.learning_rate * grad_biases
         return grad_input
 
