@@ -1,4 +1,3 @@
-from neuron import *
 import numpy as np
 from utils import *
 import math
