@@ -3,6 +3,8 @@ import numpy as np
 from utils import *
 import math
 import time
+from scipy.special import expit as sigmoid
+from scipy.special import softmax
 
 
 class Layer:
@@ -53,7 +55,9 @@ class Dense(Layer):
         #     np.dot(inputs, self.weights) + self.biases)
         # return return_values
         return_value = np.matmul(inputs, self.weights) + self.biases
-        return_value = sigmoid_function(return_value)
+        # return_value = sigmoid_function(return_value)
+        #return_value = softmax_function(return_value)
+
         #print("forward_return_value", np.shape(return_value))
         # time.sleep(1)
         return return_value
@@ -79,14 +83,31 @@ class sigmoid_layer(Layer):
         pass
 
     def forward(self, inputs):
-        return_value = 1/(1+np.exp(-inputs))
+        # print(len(inputs))
+        # quit()
+        return_value = sigmoid(inputs)
         return return_value
 
     def backward(self, inputs, gradient_output):
-        g = 1.0 / (1.0 + np.exp(-inputs))
-        g = g*(1-g)
+        fx = sigmoid(inputs)
+        return_value = fx * (1-fx)
+        return_value = return_value * gradient_output
+        return return_value
 
-        return g
+
+# class softmax_layer(Layer):
+#     def __init__(self):
+#         # self.number_of_inputs = inputs
+#         pass
+
+#     def forward(self, inputs):
+#         return_value = softmax(inputs)
+#         return return_value
+
+#     def backward(self, inputs, gradient_output):
+#         s = inputs.reshape(-1, 1)
+#         s = np.diagflat(s) - np.dot(s, s.T)
+#         return gradient_output*s
 
 
 class relu:

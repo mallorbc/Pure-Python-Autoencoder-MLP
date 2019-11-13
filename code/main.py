@@ -184,11 +184,14 @@ def forward(network, X):
     return activations
 
 
-def predict(network, X):
+def predict(network, X, display):
     """
     Compute network predictions.
     """
     logits = forward(network, X)[-1]
+    if display:
+        print(logits)
+        time.sleep(5)
     # logits = adjust_prediction(logits)
     return logits.argmax(axis=-1)
 
@@ -314,8 +317,12 @@ if __name__ == '__main__':
         hidden_layers = int(hidden_layers)
 
         network = []
-        network.append(Dense(network_input_size, 150))
-        network.append(Dense(150, 10))
+        network.append(Dense(network_input_size, 200))
+        network.append(sigmoid_layer())
+        network.append(Dense(200, 100))
+        network.append(sigmoid_layer())
+        network.append(Dense(100, 10))
+        # network.append(softmax_layer())
 
         # converts the data to integers
         loaded_label_data = [int(i) for i in loaded_label_data]
@@ -325,11 +332,11 @@ if __name__ == '__main__':
         prediction_array = []
         actual_outputs_array = []
         for epoch in range(100000):
-
+            display = True
             # print("data:", np.shape(loaded_text_data))
             # print("labels", np.shape(loaded_label_data))
             # quit()
-            for x_batch, y_batch in iterate_minibatches(loaded_text_data, loaded_label_data, batchsize=1024, shuffle=True):
+            for x_batch, y_batch in iterate_minibatches(loaded_text_data, loaded_label_data, batchsize=128, shuffle=True):
                 # print("input shape: ", np.shape(x_batch))
                 # quit()
                 # print(y_batch)
@@ -341,7 +348,8 @@ if __name__ == '__main__':
                 if epoch % 100 == 0:
                     for i in range(len(x_batch)):
                         prediction_array.append(
-                            (predict(network, x_batch[i])))
+                            (predict(network, x_batch[i], display)))
+                        display = False
                         actual_outputs_array.append(y_batch[i])
                     print("accuracy: ", get_accuracy(
                         prediction_array, actual_outputs_array), " epoch: ", epoch)
@@ -350,6 +358,7 @@ if __name__ == '__main__':
                     # output = predict(network, x_batch[0])
                     # print("Predicted: ", output)
                     # print("Actual: ", y_batch[0])
+
                     time.sleep(2)
                     break
 
