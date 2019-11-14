@@ -179,7 +179,7 @@ if __name__ == '__main__':
             test_accuracy = get_accuracy(
                 prediction_array, actual_outputs_array)
 
-            #print("test acc: ", test_accuracy)
+            # print("test acc: ", test_accuracy)
             # quit()
             if epoch % 100 == 0 and display:
                 print("epoch: ", epoch)
@@ -274,5 +274,64 @@ if __name__ == '__main__':
         plot_confusion_matrix(train_confusion_matrix,
                               "Train confusion matrix")
         plot_confusion_matrix(test_confusion_matrix, "Test confusion matrix")
+
+    elif mode == 6:
+
+        # gets the absolute path of the data and the labels
+        labels_location = os.path.realpath(labels_location)
+        data_location = os.path.realpath(data_location)
+        # loads the data from the text file
+        loaded_text_data = load_text_image_file(data_location)
+        # loads the labels from the text files
+        loaded_label_data = load_text_label_file(labels_location)
+
+        test_labels_location = os.path.realpath(test_labels_location)
+        test_data_location = os.path.realpath(test_data_location)
+        # loads the data from the text file
+        test_data = load_text_image_file(test_data_location)
+        # loads the labels from the text files
+        test_labels = load_text_label_file(test_labels_location)
+
+        loaded_label_data = [int(i) for i in loaded_label_data]
+        test_labels = [int(i) for i in test_labels]
+
+        train_data = loaded_text_data
+        train_labels = loaded_label_data
+        train_data = np.asarray(train_data)
+        train_labels = np.asarray(train_labels)
+        test_data = np.asarray(test_data)
+        test_labels = np.asarray(test_labels)
+
+        if weights_to_load is not None:
+            # print("wrong")
+            network = make_network(weights_to_load)
+        else:
+            network = make_network()
+
+        prediction_array = []
+        actual_outputs_array = []
+        check_point = "checkpoints/checkpoint"
+        graph_dir = "graphs"
+        output_graph_dir = output_dir + "/" + graph_dir
+        if not os.path.exists(output_graph_dir):
+            os.makedirs(output_graph_dir)
+        # for epoch in range(100000):
+        epoch = 0
+        print("\n")
+        while True:
+            display = True
+            for x_batch, y_batch in iterate_minibatches(train_data, train_data, batchsize=1024, shuffle=True):
+                loss = train_autoencoder(network, x_batch, y_batch)
+            if epoch % 10 == 0:
+                print("loss: ", loss)
+                print("epoch: ", epoch)
+                print("\n")
+                check_point_dir = check_point + str(epoch)
+                new_output_dir = output_dir + "/" + check_point_dir
+                save_weights(network, new_output_dir)
+                save_metrics_autoencoder(output_graph_dir, loss, epoch)
+
+            epoch = epoch + 1
+
     else:
         raise SyntaxError("Not a valid run mode")

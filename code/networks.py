@@ -122,14 +122,22 @@ def get_accuracy(predictions, actual_results):
     return float(number_correct/total)
 
 
-def grad_loss(logits, reference_answers):
+def grad_loss(outputs, reference_answers):
     # finds the errors and passes it to each layer
-    ones_for_answers = np.zeros_like(logits)
-    ones_for_answers[np.arange(len(logits)), reference_answers] = 1
+    ones_for_answers = np.zeros_like(outputs)
+    ones_for_answers[np.arange(len(outputs)), reference_answers] = 1
 
-    softmax = np.exp(logits) / np.exp(logits).sum(axis=-1, keepdims=True)
+    error = np.subtract(ones_for_answers, outputs)/outputs.shape[0]
+    # print(error)
+    # quit()
+    return_value = error*-1
 
-    return_value = (- ones_for_answers + softmax) / logits.shape[0]
+    # fx = sigmoid(inputs)
+    # return_value = fx * (1-fx)
+
+    # softmax = np.exp(outputs) / np.exp(outputs).sum(axis=-1, keepdims=True)
+
+    # return_value = (- ones_for_answers + softmax) / outputs.shape[0]
 
     return return_value
 
@@ -220,3 +228,70 @@ def save_weights(network, output_dir):
     for i in range(len(weights)):
         file_dir = output_dir + "/" + str(i) + ".npy"
         np.save(file_dir, weights[i])
+
+
+def train_autoencoder(network, X, y):
+    # passes all inputs through the network
+    layer_activations = feed_forward(network, X)
+    final_outputs = layer_activations[-1]
+    # adjust the predictions based on thresholds
+    # final_outputs = adjust_prediction(final_outputs)
+    # calculates the loss
+    loss = calculate_loss_autoencoder(final_outputs, y)
+
+    loss_grad = grad_loss_autoencoder(final_outputs, y)
+
+    # does backpropogation
+    for i in range(1, len(network)):
+        loss_grad = network[len(
+            network) - i].feed_backward(layer_activations[len(network) - i - 1], loss_grad)
+    # retunrs the loss
+    return np.mean(loss)
+
+
+def grad_loss_autoencoder(outputs, reference_answers):
+    # finds the errors and passes it to each layer
+    # ones_for_answers = np.zeros_like(logits)
+    # ones_for_answers[np.arange(len(logits)), reference_answers] = 1
+
+    # softmax = np.exp(outputs) / np.exp(outputs).sum(axis=-1, keepdims=True)
+
+    # return_value = (- reference_answers + softmax) / outputs.shape[0]
+    # ones_for_answers = np.zeros_like(outputs)
+    # ones_for_answers[np.arange(len(outputs)), reference_answers] = 1
+
+    error = np.subtract(reference_answers, outputs)/outputs.shape[0]
+    # print(error)
+    # quit()
+    return_value = error*-1
+
+    return return_value
+
+
+def calculate_loss_autoencoder(predictions, correct_labels):
+    loss_array = []
+    loss = 0
+
+    # print(np.shape(predictions))
+    # print(np.shape(correct_labels))
+
+    for i in range(len(predictions)):
+        for j in range(len(predictions[i])):
+            loss = loss + math.pow(predictions[i][j] - correct_labels[i][j], 2)
+        loss_array.append(loss)
+        loss = 0
+
+    # for i in range(len(correct_labels)):
+    #     correct_array = [0] * 10
+    #     correct_array[correct_labels[i]] = 1
+    #     for j in range(len(predictions[i])):
+    #         loss = loss + math.pow(predictions[i][j] - correct_array[j], 2)
+
+    #     loss_array.append(loss)
+    #     loss = 0
+
+    #     correct_array.clear()
+
+    loss_array = np.asarray(loss_array)
+
+    return loss_array
