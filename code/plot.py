@@ -86,7 +86,34 @@ def plot_confusion_matrix(matrix, title):
     plt.show()
 
 
-def plot_autoencoder(encoded_images, real_images, labels):
-    print(label)
-    plt.imshow(image, cmap="gray")
+def plot_autoencoder(encoded_images=None, real_images=None, labels=None):
+    total_images = []
+    total_lables = []
+
+    for image in real_images:
+        total_images.append(image)
+
+    for image in encoded_images:
+        total_images.append(image)
+
+    for i in range(2):
+        for label in labels:
+            total_lables.append(label)
+
+    h, w = 28, 28        # for raster image
+    nrows, ncols = 2, 8  # array of sub-plots
+    figsize = [24, 32]     # figure size, inches
+
+    # create figure (fig), and array of axes (ax)
+    fig, ax = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
+
+    # plot simple raster image on each sub-plot
+    for i, axi in enumerate(ax.flat):
+        img = total_images[i]
+        axi.imshow(img, cmap="gray")
+
+        # write row/col indices as axes' title for identification
+        axi.set_title("Number: "+str(total_lables[i]))
+
+    plt.tight_layout(True)
     plt.show()

@@ -3,7 +3,7 @@
 %
 %Written by: Ali Minai(3/14/16)
 
-U = load('MNISTnumImages5000.txt');
+U = load('total_data.txt');
 
 for i=1:10
     for j = 1:10

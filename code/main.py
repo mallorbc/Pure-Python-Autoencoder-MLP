@@ -14,6 +14,8 @@ from plot import *
 
 
 if __name__ == '__main__':
+    # plot_autoencoder()
+    # quit()
     now = datetime.now()
     dt_string = now.strftime("%m-%d-%H-%M-%S")
     parser = argparse.ArgumentParser(
@@ -382,6 +384,12 @@ if __name__ == '__main__':
         # encoder_image = np.reshape(prediction_array[i], (28, 28))
         # real_image = np.reshape(test_data[i])
         # plot_autoencoder(image, str(test_labels[i]))
+
+    elif mode == 9:
+        if weights_to_load is None:
+            raise SyntaxError("must have weights to load into the model")
+        network = make_network(weights_to_load)
+        get_hidden_features(network)
 
     else:
         raise SyntaxError("Not a valid run mode")

@@ -283,3 +283,7 @@ def predict_autoencoder(network, inputs):
     activations = feed_forward(network, inputs)
     last_layer = activations[-1]
     return last_layer
+
+
+def get_hidden_features(network):
+    print("test")

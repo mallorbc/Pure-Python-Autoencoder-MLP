@@ -70,6 +70,9 @@ class Dense(Layer):
         print("Loaded weights")
         time.sleep(1)
 
+    def get_weights(self):
+        return self.weights
+
 
 class sigmoid_layer(Layer):
     def __init__(self):
