@@ -148,3 +148,52 @@ def get_test_batch(test_data, test_labels, batch_size):
     test_labels = np.asarray(test_labels)
 
     return test_data, test_labels
+
+
+def save_metrics(directory, train_accuracy, test_accuracy, loss, epoch):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    train_name = directory + "/" + "train.npy"
+    test_name = directory + "/" + "test.npy"
+    loss_name = directory + "/" + "loss.npy"
+    epoch_name = directory + "/" + "epoch.npy"
+    # will hold the data
+    train_array = []
+    test_array = []
+    loss_array = []
+    epoch_array = []
+
+    # if the files exist we need to add to them
+    if os.path.isfile(train_name) and os.path.isfile(test_name) and os.path.isfile(loss_name) and os.path.isfile(epoch_name):
+        # loads the data
+        train_array = np.load(train_name)
+        test_array = np.load(test_name)
+        loss_array = np.load(loss_name)
+        epoch_array = np.load(epoch_name)
+
+        # adds the data to the array
+        train_array = np.append(train_array, train_accuracy)
+        test_array = np.append(test_array, test_accuracy)
+        loss_array = np.append(loss_array, loss)
+        epoch_array = np.append(epoch_array, epoch)
+
+        # saves the data again
+        np.save(train_name, train_array)
+        np.save(test_name, test_array)
+        np.save(loss_name, loss_array)
+        np.save(epoch_name, epoch_array)
+    else:
+        train_array = np.append(train_array, train_accuracy)
+        test_array = np.append(test_array, test_accuracy)
+        loss_array = np.append(loss_array, loss)
+        epoch_array = np.append(epoch_array, epoch)
+
+        train_array = np.asarray(train_array)
+        test_array = np.asarray(test_array)
+        loss_array = np.asarray(loss_array)
+        epoch_array = np.asarray(epoch_array)
+
+        np.save(train_name, train_array)
+        np.save(test_name, test_array)
+        np.save(loss_name, loss_array)
+        np.save(epoch_name, epoch_array)

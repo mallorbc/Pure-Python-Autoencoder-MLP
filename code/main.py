@@ -8,6 +8,8 @@ from layer import *
 from networks import *
 from datetime import datetime
 
+from plot import *
+
 
 if __name__ == '__main__':
     now = datetime.now()
@@ -28,6 +30,8 @@ if __name__ == '__main__':
                         help="file that contains the test data", type=str)
     parser.add_argument("-tl", "--test_labels", default=None,
                         help="file that contains the labels for the test data", type=str)
+    parser.add_argument("-pd", "--plot_dir", default=None,
+                        help="directory that has the plot data", type=str)
     # parses the arguments
     args = parser.parse_args()
     mode = args.mode
@@ -37,6 +41,10 @@ if __name__ == '__main__':
     weights_to_load = args.load
     test_data_location = args.test_data
     test_labels_location = args.test_labels
+    plot_dir = args.plot_dir
+
+    if plot_dir is not None:
+        plot_dir = os.path.realpath(plot_dir)
 
     output_dir = output_dir + "/" + dt_string
     if not os.path.exists(output_dir):
@@ -47,14 +55,14 @@ if __name__ == '__main__':
     # makes the output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-
-    # gets the absolute path of the data and the labels
-    labels_location = os.path.realpath(labels_location)
-    data_location = os.path.realpath(data_location)
-    # loads the data from the text file
-    loaded_text_data = load_text_image_file(data_location)
-    # loads the labels from the text files
-    loaded_label_data = load_text_label_file(labels_location)
+    if mode < 4:
+        # gets the absolute path of the data and the labels
+        labels_location = os.path.realpath(labels_location)
+        data_location = os.path.realpath(data_location)
+        # loads the data from the text file
+        loaded_text_data = load_text_image_file(data_location)
+        # loads the labels from the text files
+        loaded_label_data = load_text_label_file(labels_location)
 
     # this displays the images
     if mode == 1:
@@ -182,6 +190,8 @@ if __name__ == '__main__':
                 display = False
 
             save_weights(network, new_output_dir)
+            save_metrics(output_graph_dir, train_accuracy,
+                         test_accuracy, loss, epoch)
             prediction_array.clear()
             actual_outputs_array.clear()
             # output = predict(network, x_batch[0])
@@ -191,6 +201,46 @@ if __name__ == '__main__':
             # time.sleep(1)
             # break
             epoch = epoch + 1
+    elif mode == 4:
+        plot_data(plot_dir)
 
+    elif mode == 5:
+        if weights_to_load is None:
+            raise SyntaxError("must have weights to load into the model")
+        if data_location is None:
+            raise SyntaxError("must have training data location")
+        if labels_location is None:
+            raise SyntaxError("must have training labels location")
+        if test_data_location is None:
+            raise SyntaxError("must have test data location")
+        if test_labels_location is None:
+            raise SyntaxError("must have test labels location")
+
+        # gets the absolute path of the data and the labels
+        labels_location = os.path.realpath(labels_location)
+        data_location = os.path.realpath(data_location)
+        # loads the data from the text file
+        loaded_text_data = load_text_image_file(data_location)
+        # loads the labels from the text files
+        loaded_label_data = load_text_label_file(labels_location)
+
+        test_labels_location = os.path.realpath(labels_location)
+        test_data_location = os.path.realpath(data_location)
+        # loads the data from the text file
+        test_data = load_text_image_file(test_data_location)
+        # loads the labels from the text files
+        test_labels = load_text_label_file(test_labels_location)
+
+        loaded_label_data = [int(i) for i in loaded_label_data]
+        test_labels = [int(i) for i in test_labels]
+
+        train_data = loaded_text_data
+        train_labels = loaded_label_data
+        train_data = np.asarray(train_data)
+        train_labels = np.asarray(train_labels)
+        test_data = np.asarray(test_data)
+        test_labels = np.asarray(test_labels)
+
+        make_confusion_matrix_array
     else:
         raise SyntaxError("Not a valid run mode")
