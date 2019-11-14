@@ -31,7 +31,7 @@ class Dense(Layer):
         # sets the biases in the layer
         self.set_biases()
         self.learning_rate = 0.1
-        self.momentum = 0.1
+        self.momentum = 0.5
         self.previous_weight_change = 0
 
     def set_weights(self):

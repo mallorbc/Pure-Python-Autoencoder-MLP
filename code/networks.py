@@ -119,7 +119,7 @@ def get_accuracy(predictions, actual_results):
     for i in range(len(predictions)):
         if predictions[i] == actual_results[i]:
             number_correct = number_correct + 1
-    return number_correct/total
+    return float(number_correct/total)
 
 
 def grad_loss(logits, reference_answers):
@@ -184,8 +184,8 @@ def predict(network, X, display):
     # adjusts the predictions
    # predictions = adjust_prediction(predictions)
     # displays the predictions outputs
-    if display:
-        print(predictions)
+    # if display:
+    #     print(predictions)
     # returns the highest value
     return predictions.argmax(axis=-1)
 

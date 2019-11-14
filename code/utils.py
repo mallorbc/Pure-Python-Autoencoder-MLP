@@ -136,16 +136,15 @@ def sigmoid_derivative(x):
     return x * (1.0 - x)
 
 
-def softmax_function(A):
-    """Compute softma values for each sets of scores in x."""
-    softmax_array = []
-    # for item in x:
-    #     e_x = np.exp(item - np.max(item))
-    #     softmax_array.append(e_x / e_x.sum(axis=0))  # only difference
-    # softmax_array = np.asarray(softmax_array)
-    # return softmax_array
-    for item in A:
-        e = np.exp(item)
-        softmax_array.append(e / np.sum(e, axis=-1, keepdims=True))
-    softmax_array = np.asarray(softmax_array)
-    return softmax_array
+def get_test_batch(test_data, test_labels, batch_size):
+    return_image_batch = []
+    return_label_batch = []
+    # shuffles data
+    test_data, test_labels = shuffle(test_data, test_labels)
+    test_data = test_data[:batch_size]
+    test_labels = test_labels[:batch_size]
+    # converts to numpy arrays
+    test_data = np.asarray(test_data)
+    test_labels = np.asarray(test_labels)
+
+    return test_data, test_labels
