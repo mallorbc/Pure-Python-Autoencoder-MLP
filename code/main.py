@@ -103,8 +103,8 @@ if __name__ == '__main__':
 
         if test_data_location is not None and test_labels_location is not None:
             # gets the absolute path of the data and the labels
-            test_labels_location = os.path.realpath(labels_location)
-            test_data_location = os.path.realpath(data_location)
+            test_labels_location = os.path.realpath(test_labels_location)
+            test_data_location = os.path.realpath(test_data_location)
             # loads the data from the text file
             test_data = load_text_image_file(test_data_location)
             # loads the labels from the text files
@@ -224,8 +224,8 @@ if __name__ == '__main__':
         # loads the labels from the text files
         loaded_label_data = load_text_label_file(labels_location)
 
-        test_labels_location = os.path.realpath(labels_location)
-        test_data_location = os.path.realpath(data_location)
+        test_labels_location = os.path.realpath(test_labels_location)
+        test_data_location = os.path.realpath(test_data_location)
         # loads the data from the text file
         test_data = load_text_image_file(test_data_location)
         # loads the labels from the text files
@@ -240,6 +240,9 @@ if __name__ == '__main__':
         train_labels = np.asarray(train_labels)
         test_data = np.asarray(test_data)
         test_labels = np.asarray(test_labels)
+
+        print("Train: ", np.shape(train_data))
+        print("Test: ", np.shape(test_data))
 
         # all data is now loaded and ready to go
         # now we make a model
