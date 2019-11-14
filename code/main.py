@@ -396,6 +396,47 @@ if __name__ == '__main__':
         mlp_network = make_network(weights_to_load)
         encoder_network = make_network(second_weights)
         get_hidden_features(mlp_network,encoder_network)
+    
+    elif mode == 10:
+        if weights_to_load is None:
+            raise SyntaxError("must have weights to load into the model")
+        if data_location is None:
+            raise SyntaxError("must have training data location")
+        if test_data_location is None:
+            raise SyntaxError("must have test data location")
+
+
+        # gets the absolute path of the data and the labels
+        data_location = os.path.realpath(data_location)
+        # loads the data from the text file
+        loaded_text_data = load_text_image_file(data_location)
+
+
+        test_data_location = os.path.realpath(test_data_location)
+        # loads the data from the text file
+        test_data = load_text_image_file(test_data_location)
+
+
+
+
+        train_data = loaded_text_data
+
+        train_data = np.asarray(train_data)
+
+        test_data = np.asarray(test_data)
+
+
+        network = make_network(weights_to_load)
+
+        train_loss = get_loss(network,train_data,train_data)
+        test_loss = get_loss(network,test_data,test_data)
+
+        print("train loss: ",train_loss)
+        print("test loss: ",test_loss)
+
+        plot_bar_loss(train_loss,test_loss)
+
+
 
     else:
         raise SyntaxError("Not a valid run mode")

@@ -80,7 +80,7 @@ def plot_confusion_matrix(matrix, title):
 
     sn.set(font_scale=1.4)  # for label size
     ax = sn.heatmap(df_cm, annot=True, fmt='g',
-                    annot_kws={"size": 14})  # font size
+                    annot_kws={"size": 20})  # font size
     ax.set(xlabel='Predicted', ylabel='Actual')
     plt.title(title)
     plt.show()
@@ -156,4 +156,29 @@ def plot_features(mlp_images, encoder_images):
         axi.set_title("Neuron: "+str(i))
 
     plt.tight_layout(True)
+    plt.show()
+
+
+def plot_bar_loss(train_loss, test_loss):
+    values = []
+    labels = []
+    values.append(train_loss)
+    values.append(test_loss)
+    labels.append("Train")
+    labels.append("Test")
+    fig, ax = plt.subplots()
+
+    rects1 = ax.bar(labels, values, color='r')
+    for rect in rects1:
+        height = rect.get_height()
+        ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
+                '%3f' % float(height),
+                ha='center', va='bottom')
+
+    plt.ylabel('Loss')
+    plt.title('Loss: Train and Test')
+
+    # plt.show()
+    plt.bar(labels, values)
+    # plt.bar(test_loss)
     plt.show()
