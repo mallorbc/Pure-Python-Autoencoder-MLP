@@ -36,6 +36,7 @@ if __name__ == '__main__':
                         help="file that contains the labels for the test data", type=str)
     parser.add_argument("-pd", "--plot_dir", default=None,
                         help="directory that has the plot data", type=str)
+    parser.add_argument("-ldt","--loadtwo",help="allows us to load the weights of the other model",default=None,type=str)                      
     # parses the arguments
     args = parser.parse_args()
     mode = args.mode
@@ -46,6 +47,9 @@ if __name__ == '__main__':
     test_data_location = args.test_data
     test_labels_location = args.test_labels
     plot_dir = args.plot_dir
+
+    second_weights = args.loadtwo
+    
 
     if plot_dir is not None:
         plot_dir = os.path.realpath(plot_dir)
@@ -388,8 +392,12 @@ if __name__ == '__main__':
     elif mode == 9:
         if weights_to_load is None:
             raise SyntaxError("must have weights to load into the model")
-        network = make_network(weights_to_load)
-        get_hidden_features(network)
+        if second_weights is None:
+            raise SyntaxError("must have second weights to load into the model")
+        #second_weights = os.path.realpath(second_weights)
+        mlp_network = make_network(weights_to_load)
+        encoder_network = make_network(second_weights)
+        get_hidden_features(mlp_network,encoder_network)
 
     else:
         raise SyntaxError("Not a valid run mode")

@@ -117,3 +117,43 @@ def plot_autoencoder(encoded_images=None, real_images=None, labels=None):
 
     plt.tight_layout(True)
     plt.show()
+
+
+def test_plot(image):
+    image = np.reshape(image, (28, 28))
+    plt.imshow(image, cmap="gray")
+    plt.show()
+
+
+def plot_features(mlp_images, encoder_images):
+
+    nrows, ncols = 4, 5  # array of sub-plots
+    figsize = [12, 18]     # figure size, inches
+
+    # create figure (fig), and array of axes (ax)
+    fig, ax = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
+
+    # plot simple raster image on each sub-plot
+    for i, axi in enumerate(ax.flat):
+        img = mlp_images[i]
+        axi.imshow(img, cmap="gray")
+
+        # write row/col indices as axes' title for identification
+        axi.set_title("Neuron: "+str(i))
+
+    plt.tight_layout(True)
+    plt.show()
+
+    # create figure (fig), and array of axes (ax)
+    fig, ax = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
+
+    # plot simple raster image on each sub-plot
+    for i, axi in enumerate(ax.flat):
+        img = encoder_images[i]
+        axi.imshow(img, cmap="gray")
+
+        # write row/col indices as axes' title for identification
+        axi.set_title("Neuron: "+str(i))
+
+    plt.tight_layout(True)
+    plt.show()

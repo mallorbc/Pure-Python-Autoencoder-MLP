@@ -68,7 +68,6 @@ class Dense(Layer):
     def load_weights(self, weights_to_load):
         self.weights = np.load(weights_to_load)
         print("Loaded weights")
-        time.sleep(1)
 
     def get_weights(self):
         return self.weights

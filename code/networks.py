@@ -3,6 +3,7 @@ import math
 import time
 from layer import *
 import os
+from plot import *
 
 
 def make_network(weights_to_load=None):
@@ -285,5 +286,31 @@ def predict_autoencoder(network, inputs):
     return last_layer
 
 
-def get_hidden_features(network):
+def get_hidden_features(mlp_network, encoder_network):
     print("test")
+    # weights1 = network[0].get_weights()
+    mlp_weights = mlp_network[0].get_weights()
+    print(np.shape(mlp_weights))
+    encoder_weights = encoder_network[0].get_weights()
+    mlp_weights = np.transpose(mlp_weights)
+    encoder_weights = np.transpose(encoder_weights)
+    # weights1 = np.transpose(weights1)
+    # print(np.shape(weights1))
+    # print(np.shape(weights2))
+    counter = 0
+    mlp_images = []
+    encoder_images = []
+    for i in range(len(mlp_weights)):
+        if i % 10 == 0:
+            image = np.reshape(mlp_weights[i], (28, 28))
+            mlp_images.append(image)
+            image = np.reshape(encoder_weights[i], (28, 28))
+            encoder_images.append(image)
+    plot_features(mlp_images,encoder_images)
+
+            # mlp = mlp_weights[i]
+            # test_plot(test)
+            # test2 = encoder_weights[i]
+            # test_plot(test2)
+            # counter = counter + 1
+            # print(counter)
