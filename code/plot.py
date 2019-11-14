@@ -46,3 +46,8 @@ def plot_data(directory):
 
 def make_confusion_matrix_array(actual, predicted):
     matrix = confusion_matrix(actual, predicted)
+    return matrix
+
+
+def plot_confusion_matrix(matrix):
+    print("matrix")

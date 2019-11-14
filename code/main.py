@@ -241,6 +241,32 @@ if __name__ == '__main__':
         test_data = np.asarray(test_data)
         test_labels = np.asarray(test_labels)
 
-        make_confusion_matrix_array
+        # all data is now loaded and ready to go
+        # now we make a model
+        prediction_array = []
+        actual_outputs_array = []
+        network = make_network(weights_to_load)
+        for i in range(len(train_data)):
+            prediction_array.append(predict(network, train_data[i], False))
+            actual_outputs_array.append(train_labels[i])
+        # confusion_matrix for the training data
+        train_confusion_matrix = make_confusion_matrix_array(
+            actual_outputs_array, prediction_array)
+
+        # make a confusion matrix  for the test data
+
+        prediction_array.clear()
+        actual_outputs_array.clear()
+
+        for i in range(len(test_data)):
+            prediction_array.append(predict(network, test_data[i], False))
+            actual_outputs_array.append(test_labels[i])
+        test_confusion_matrix = make_confusion_matrix_array(
+            actual_outputs_array, prediction_array)
+        print("train matrix:")
+        print(train_confusion_matrix)
+        print("\n")
+        print("test matrix:")
+        print(test_confusion_matrix)
     else:
         raise SyntaxError("Not a valid run mode")
