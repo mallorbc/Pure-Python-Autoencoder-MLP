@@ -159,7 +159,7 @@ def plot_features(mlp_images, encoder_images):
     plt.show()
 
 
-def plot_bar_loss(train_loss, test_loss):
+def plot_bar_loss(train_loss, test_loss, title):
     values = []
     labels = []
     values.append(train_loss)
@@ -176,7 +176,7 @@ def plot_bar_loss(train_loss, test_loss):
                 ha='center', va='bottom')
 
     plt.ylabel('Loss')
-    plt.title('Loss: Train and Test')
+    plt.title(title)
 
     # plt.show()
     plt.bar(labels, values)

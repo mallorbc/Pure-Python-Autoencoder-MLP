@@ -241,3 +241,11 @@ def save_metrics_autoencoder(directory, loss_train, loss_test, epoch):
         np.save(loss_train_name, loss_train_array)
         np.save(loss_test_name, loss_test_array)
         np.save(epoch_name, epoch_array)
+
+
+def get_data_by_label(images, labels, desired_number):
+    data_to_return = []
+    for i in range(len(images)):
+        if labels[i] == desired_number:
+            data_to_return.append(images[i])
+    return data_to_return

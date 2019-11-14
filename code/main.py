@@ -402,29 +402,37 @@ if __name__ == '__main__':
             raise SyntaxError("must have weights to load into the model")
         if data_location is None:
             raise SyntaxError("must have training data location")
+        if labels_location is None:
+            raise SyntaxError("must have training labels location")
         if test_data_location is None:
             raise SyntaxError("must have test data location")
-
+        if test_labels_location is None:
+            raise SyntaxError("must have test labels location")
 
         # gets the absolute path of the data and the labels
+        labels_location = os.path.realpath(labels_location)
         data_location = os.path.realpath(data_location)
         # loads the data from the text file
         loaded_text_data = load_text_image_file(data_location)
+        # loads the labels from the text files
+        loaded_label_data = load_text_label_file(labels_location)
 
-
+        test_labels_location = os.path.realpath(test_labels_location)
         test_data_location = os.path.realpath(test_data_location)
         # loads the data from the text file
         test_data = load_text_image_file(test_data_location)
+        # loads the labels from the text files
+        test_labels = load_text_label_file(test_labels_location)
 
-
-
+        loaded_label_data = [int(i) for i in loaded_label_data]
+        test_labels = [int(i) for i in test_labels]
 
         train_data = loaded_text_data
-
+        train_labels = loaded_label_data
         train_data = np.asarray(train_data)
-
+        train_labels = np.asarray(train_labels)
         test_data = np.asarray(test_data)
-
+        test_labels = np.asarray(test_labels)
 
         network = make_network(weights_to_load)
 
@@ -434,7 +442,14 @@ if __name__ == '__main__':
         print("train loss: ",train_loss)
         print("test loss: ",test_loss)
 
-        plot_bar_loss(train_loss,test_loss)
+        plot_bar_loss(train_loss,test_loss,"Loss: All Data")
+
+        for i in range(10):
+            train_batch = get_data_by_label(train_data,train_labels,i)
+            test_batch = get_data_by_label(test_data,test_labels,i)
+            train_loss = get_loss(network,train_batch,train_batch)
+            test_loss = get_loss(network,test_batch,test_batch)
+            plot_bar_loss(train_loss,test_loss,"Loss: Number "+str(i))
 
 
 
