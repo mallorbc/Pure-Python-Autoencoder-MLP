@@ -58,7 +58,7 @@ def plot_data_autoencoder(directory):
     epoch_array = np.load(epoch_name)
 
     plt.plot(epoch_array, loss_train_array, label="Loss Train")
-    plt.plot(epoch_array, loss_test_array, label="Loss Train")
+    plt.plot(epoch_array, loss_test_array, label="Loss Test")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.title("Loss vs Epoch")
@@ -83,4 +83,10 @@ def plot_confusion_matrix(matrix, title):
                     annot_kws={"size": 14})  # font size
     ax.set(xlabel='Predicted', ylabel='Actual')
     plt.title(title)
+    plt.show()
+
+
+def plot_autoencoder(encoded_images, real_images, labels):
+    print(label)
+    plt.imshow(image, cmap="gray")
     plt.show()

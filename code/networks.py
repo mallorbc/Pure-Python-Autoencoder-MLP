@@ -182,7 +182,7 @@ def feed_forward(network, X):
     return activations
 
 
-def predict(network, input, display):
+def predict(network, inputs, display):
     # feeds forward and grabs the last layer
     predictions = feed_forward(network, inputs)[-1]
     # adjusts the predictions
@@ -277,3 +277,9 @@ def get_loss(network, inputs, labels):
 
     loss = np.mean(loss)
     return loss
+
+
+def predict_autoencoder(network, inputs):
+    activations = feed_forward(network, inputs)
+    last_layer = activations[-1]
+    return last_layer

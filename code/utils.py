@@ -37,6 +37,9 @@ def load_text_label_file(path_to_file):
 
 def reshape_image_data(image_data, flip_and_rotate=False):
     reshaped_data = []
+    print(image_data)
+    print(len(image_data))
+    # quit()
     for image in image_data:
         # reshapes the image into a 28x28 2d array
         reshaped_image = np.reshape(image, (28, 28))

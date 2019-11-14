@@ -7,6 +7,8 @@ import time
 from layer import *
 from networks import *
 from datetime import datetime
+# import matplotlib.pyplot as plt
+
 
 from plot import *
 
@@ -338,6 +340,48 @@ if __name__ == '__main__':
 
     elif mode == 7:
         plot_data_autoencoder(plot_dir)
+
+    elif mode == 8:
+        prediction_array = []
+        if weights_to_load is None:
+            raise SyntaxError("must have weights to load into the model")
+        if test_data_location is None:
+            raise SyntaxError("must have test data location")
+        if test_labels_location is None:
+            raise SyntaxError("must have test labels location")
+        # gets the test data
+
+        test_labels_location = os.path.realpath(test_labels_location)
+        test_data_location = os.path.realpath(test_data_location)
+        test_data = load_text_image_file(test_data_location)
+        test_labels = load_text_label_file(test_labels_location)
+        test_labels = [int(i) for i in test_labels]
+
+        # load an autoencoder
+        network = make_network(weights_to_load)
+        # shuffles the dataset
+        test_data, test_labels = shuffle_data(test_data, test_labels)
+        # grabs 8 images
+        test_data = test_data[:8]
+        test_labels = test_labels[:8]
+        # predicts the images
+        for image in test_data:
+            prediction_array.append(predict_autoencoder(network, image))
+        prediction_array = np.asarray(prediction_array)
+
+        # displays the images
+        encoded_images = []
+        real_images = []
+        images_labels = []
+        for i in range(len(prediction_array)):
+            encoded_images.append(np.reshape(prediction_array[i], (28, 28)))
+            real_images.append(np.reshape(test_data[i], (28, 28)))
+            images_labels.append(test_labels[i])
+        # plots the 8 images real and fake
+        plot_autoencoder(encoded_images, real_images, images_labels)
+        # encoder_image = np.reshape(prediction_array[i], (28, 28))
+        # real_image = np.reshape(test_data[i])
+        # plot_autoencoder(image, str(test_labels[i]))
 
     else:
         raise SyntaxError("Not a valid run mode")

@@ -39,4 +39,4 @@ RUN conda init \
 && conda install -n intelligent pandas \
 && conda install -n intelligent opencv \
 && conda install -n intelligent seaborn \ 
-&& conda install -n intelligent tqdm
+&& conda install -n intelligent tqdm 
