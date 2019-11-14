@@ -385,9 +385,7 @@ if __name__ == '__main__':
             images_labels.append(test_labels[i])
         # plots the 8 images real and fake
         plot_autoencoder(encoded_images, real_images, images_labels)
-        # encoder_image = np.reshape(prediction_array[i], (28, 28))
-        # real_image = np.reshape(test_data[i])
-        # plot_autoencoder(image, str(test_labels[i]))
+
 
     elif mode == 9:
         if weights_to_load is None:

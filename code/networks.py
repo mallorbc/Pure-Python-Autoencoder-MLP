@@ -46,8 +46,6 @@ def make_network(weights_to_load=None):
 
         weights = full_path_weights
 
-        # print(weights)
-        # quit()
         for i in range(hidden_layers):
             layer_number = i + 1
             layer_sizes = input(
@@ -132,10 +130,6 @@ def grad_loss(outputs, reference_answers):
 
     return_value = error*-1
 
-    # softmax = np.exp(outputs) / np.exp(outputs).sum(axis=-1, keepdims=True)
-
-    # return_value = (- ones_for_answers + softmax) / outputs.shape[0]
-
     return return_value
 
 
@@ -199,9 +193,7 @@ def train(network, X, y):
     # passes all inputs through the network
     layer_activations = feed_forward(network, X)
     final_outputs = layer_activations[-1]
-    # adjust the predictions based on thresholds
-    # final_outputs = adjust_prediction(final_outputs)
-    # calculates the loss
+
     loss = calculate_loss(final_outputs, y)
 
     loss_grad = grad_loss(final_outputs, y)
@@ -287,16 +279,13 @@ def predict_autoencoder(network, inputs):
 
 
 def get_hidden_features(mlp_network, encoder_network):
-    print("test")
-    # weights1 = network[0].get_weights()
+
     mlp_weights = mlp_network[0].get_weights()
-    print(np.shape(mlp_weights))
+
     encoder_weights = encoder_network[0].get_weights()
     mlp_weights = np.transpose(mlp_weights)
     encoder_weights = np.transpose(encoder_weights)
-    # weights1 = np.transpose(weights1)
-    # print(np.shape(weights1))
-    # print(np.shape(weights2))
+
     counter = 0
     mlp_images = []
     encoder_images = []
@@ -306,11 +295,4 @@ def get_hidden_features(mlp_network, encoder_network):
             mlp_images.append(image)
             image = np.reshape(encoder_weights[i], (28, 28))
             encoder_images.append(image)
-    plot_features(mlp_images,encoder_images)
-
-            # mlp = mlp_weights[i]
-            # test_plot(test)
-            # test2 = encoder_weights[i]
-            # test_plot(test2)
-            # counter = counter + 1
-            # print(counter)
+    plot_features(mlp_images, encoder_images)
