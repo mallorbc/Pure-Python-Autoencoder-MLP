@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import confusion_matrix
+import seaborn as sn
+import pandas as pd
 
 
 def plot_data(directory):
@@ -49,5 +51,16 @@ def make_confusion_matrix_array(actual, predicted):
     return matrix
 
 
-def plot_confusion_matrix(matrix):
+def plot_confusion_matrix(matrix, title):
     print("matrix")
+    array = matrix
+
+    df_cm = pd.DataFrame(array, index=[i for i in "0123456789"], columns=[
+                         i for i in "0123456789"])
+
+    sn.set(font_scale=1.4)  # for label size
+    ax = sn.heatmap(df_cm, annot=True, fmt='g',
+                    annot_kws={"size": 14})  # font size
+    ax.set(xlabel='Predicted', ylabel='Actual')
+    plt.title(title)
+    plt.show()

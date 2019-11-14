@@ -263,10 +263,13 @@ if __name__ == '__main__':
             actual_outputs_array.append(test_labels[i])
         test_confusion_matrix = make_confusion_matrix_array(
             actual_outputs_array, prediction_array)
-        print("train matrix:")
-        print(train_confusion_matrix)
-        print("\n")
-        print("test matrix:")
-        print(test_confusion_matrix)
+        # print("train matrix:")
+        # print(train_confusion_matrix)
+        # print("\n")
+        # print("test matrix:")
+        # print(test_confusion_matrix)
+        plot_confusion_matrix(train_confusion_matrix,
+                              "Train confusion matrix")
+        plot_confusion_matrix(test_confusion_matrix, "Test confusion matrix")
     else:
         raise SyntaxError("Not a valid run mode")
