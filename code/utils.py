@@ -199,34 +199,42 @@ def save_metrics(directory, train_accuracy, test_accuracy, loss, epoch):
         np.save(epoch_name, epoch_array)
 
 
-def save_metrics_autoencoder(directory, loss, epoch):
+def save_metrics_autoencoder(directory, loss_train, loss_test, epoch):
     if not os.path.exists(directory):
         os.makedirs(directory)
-    loss_name = directory + "/" + "loss.npy"
+    loss_train_name = directory + "/" + "loss_train.npy"
+    loss_test_name = directory + "/" + "loss_test.npy"
     epoch_name = directory + "/" + "epoch.npy"
     # will hold the data
-    loss_array = []
+    loss_train_array = []
+    loss_test_array = []
     epoch_array = []
 
     # if the files exist we need to add to them
-    if os.path.isfile(loss_name) and os.path.isfile(epoch_name):
+    if os.path.isfile(loss_train_name) and os.path.isfile(epoch_name) and os.path.isfile(loss_test_name):
         # loads the data
-        loss_array = np.load(loss_name)
+        loss_train_array = np.load(loss_train_name)
+        loss_test_array = np.load(loss_test_name)
         epoch_array = np.load(epoch_name)
 
         # adds the data to the array
-        loss_array = np.append(loss_array, loss)
+        loss_train_array = np.append(loss_train_array, loss_train)
+        loss_test_array = np.append(loss_test_array, loss_test)
         epoch_array = np.append(epoch_array, epoch)
 
         # saves the data again
-        np.save(loss_name, loss_array)
+        np.save(loss_train_name, loss_train_array)
+        np.save(loss_test_name, loss_test_array)
         np.save(epoch_name, epoch_array)
     else:
-        loss_array = np.append(loss_array, loss)
+        loss_train_array = np.append(loss_train_array, loss_train)
+        loss_test_array = np.append(loss_test_array, loss_test)
         epoch_array = np.append(epoch_array, epoch)
 
-        loss_array = np.asarray(loss_array)
+        loss_train_array = np.asarray(loss_train_array)
+        loss_test_array = np.asarray(loss_test_array)
         epoch_array = np.asarray(epoch_array)
 
-        np.save(loss_name, loss_array)
+        np.save(loss_train_name, loss_train_array)
+        np.save(loss_test_name, loss_test_array)
         np.save(epoch_name, epoch_array)

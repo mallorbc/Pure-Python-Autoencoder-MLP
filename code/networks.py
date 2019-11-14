@@ -128,12 +128,8 @@ def grad_loss(outputs, reference_answers):
     ones_for_answers[np.arange(len(outputs)), reference_answers] = 1
 
     error = np.subtract(ones_for_answers, outputs)/outputs.shape[0]
-    # print(error)
-    # quit()
-    return_value = error*-1
 
-    # fx = sigmoid(inputs)
-    # return_value = fx * (1-fx)
+    return_value = error*-1
 
     # softmax = np.exp(outputs) / np.exp(outputs).sum(axis=-1, keepdims=True)
 
@@ -186,9 +182,9 @@ def feed_forward(network, X):
     return activations
 
 
-def predict(network, X, display):
+def predict(network, input, display):
     # feeds forward and grabs the last layer
-    predictions = feed_forward(network, X)[-1]
+    predictions = feed_forward(network, inputs)[-1]
     # adjusts the predictions
    # predictions = adjust_prediction(predictions)
     # displays the predictions outputs
@@ -251,18 +247,8 @@ def train_autoencoder(network, X, y):
 
 def grad_loss_autoencoder(outputs, reference_answers):
     # finds the errors and passes it to each layer
-    # ones_for_answers = np.zeros_like(logits)
-    # ones_for_answers[np.arange(len(logits)), reference_answers] = 1
-
-    # softmax = np.exp(outputs) / np.exp(outputs).sum(axis=-1, keepdims=True)
-
-    # return_value = (- reference_answers + softmax) / outputs.shape[0]
-    # ones_for_answers = np.zeros_like(outputs)
-    # ones_for_answers[np.arange(len(outputs)), reference_answers] = 1
-
     error = np.subtract(reference_answers, outputs)/outputs.shape[0]
-    # print(error)
-    # quit()
+
     return_value = error*-1
 
     return return_value
@@ -271,27 +257,23 @@ def grad_loss_autoencoder(outputs, reference_answers):
 def calculate_loss_autoencoder(predictions, correct_labels):
     loss_array = []
     loss = 0
-
-    # print(np.shape(predictions))
-    # print(np.shape(correct_labels))
-
+    # sums the pixel differences for the batches and returns it
     for i in range(len(predictions)):
         for j in range(len(predictions[i])):
             loss = loss + math.pow(predictions[i][j] - correct_labels[i][j], 2)
         loss_array.append(loss)
         loss = 0
 
-    # for i in range(len(correct_labels)):
-    #     correct_array = [0] * 10
-    #     correct_array[correct_labels[i]] = 1
-    #     for j in range(len(predictions[i])):
-    #         loss = loss + math.pow(predictions[i][j] - correct_array[j], 2)
-
-    #     loss_array.append(loss)
-    #     loss = 0
-
-    #     correct_array.clear()
-
     loss_array = np.asarray(loss_array)
 
     return loss_array
+
+
+def get_loss(network, inputs, labels):
+    layer_activations = feed_forward(network, inputs)
+    final_outputs = layer_activations[-1]
+
+    loss = calculate_loss_autoencoder(final_outputs, labels)
+
+    loss = np.mean(loss)
+    return loss

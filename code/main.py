@@ -321,17 +321,23 @@ if __name__ == '__main__':
         while True:
             display = True
             for x_batch, y_batch in iterate_minibatches(train_data, train_data, batchsize=1024, shuffle=True):
-                loss = train_autoencoder(network, x_batch, y_batch)
+                loss_train = train_autoencoder(network, x_batch, y_batch)
             if epoch % 10 == 0:
-                print("loss: ", loss)
+                loss_test = get_loss(network, test_data, test_data)
+                print("loss train: ", loss_train)
+                print("loss test: ", loss_test)
                 print("epoch: ", epoch)
                 print("\n")
                 check_point_dir = check_point + str(epoch)
                 new_output_dir = output_dir + "/" + check_point_dir
                 save_weights(network, new_output_dir)
-                save_metrics_autoencoder(output_graph_dir, loss, epoch)
+                save_metrics_autoencoder(
+                    output_graph_dir, loss_train, loss_test, epoch)
 
             epoch = epoch + 1
+
+    elif mode == 7:
+        plot_data_autoencoder(plot_dir)
 
     else:
         raise SyntaxError("Not a valid run mode")

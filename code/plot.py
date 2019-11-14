@@ -46,6 +46,26 @@ def plot_data(directory):
     plt.show()
 
 
+def plot_data_autoencoder(directory):
+    loss_train_name = directory + "/" + "loss_train.npy"
+    loss_test_name = directory + "/" + "loss_test.npy"
+
+    epoch_name = directory + "/" + "epoch.npy"
+
+    loss_train_array = np.load(loss_train_name)
+    loss_test_array = np.load(loss_test_name)
+
+    epoch_array = np.load(epoch_name)
+
+    plt.plot(epoch_array, loss_train_array, label="Loss Train")
+    plt.plot(epoch_array, loss_test_array, label="Loss Train")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Loss vs Epoch")
+    plt.legend()
+    plt.show()
+
+
 def make_confusion_matrix_array(actual, predicted):
     matrix = confusion_matrix(actual, predicted)
     return matrix
