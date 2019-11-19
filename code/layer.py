@@ -13,12 +13,17 @@ class Layer:
 
 
 class Dense(Layer):
-    def __init__(self, number_of_inputs, number_of_outputs, weights_to_load=None):
+    def __init__(self, number_of_inputs, number_of_outputs, weights_to_load=None, is_trainable=True):
         print("new layer with ", number_of_inputs,
               " neruons and ", number_of_outputs, " outputs")
         # sets the number of inputs and outputs
         self.number_of_inputs = number_of_inputs
         self.number_of_outputs = number_of_outputs
+        self.trainable = is_trainable
+        if self.trainable:
+            print("Dense layer is trainable")
+        else:
+            print("Dense layer is not trainable")
         # sets the weights for the network
         if weights_to_load is None:
             self.set_weights()
@@ -37,6 +42,7 @@ class Dense(Layer):
     def set_weights(self):
         self.weights = np.random.randn(
             self.number_of_inputs, self.number_of_outputs)*0.01
+        print("Dense layer weights set randomly")
 
     def set_biases(self):
         self.biases = np.zeros(self.number_of_outputs)
@@ -54,12 +60,13 @@ class Dense(Layer):
         grad_biases = np.sum(grad_output, axis=0)
 
         # gradient descent step.
-        weight_change = (self.momentum * self.previous_weight_change) + \
-            (self.learning_rate * grad_weights)
-        self.weights = self.weights - weight_change
-        # updates old weight change for momentum
-        self.previous_weight_change = weight_change
-        self.biases = self.biases - self.learning_rate * grad_biases
+        if self.trainable == True:
+            weight_change = (self.momentum * self.previous_weight_change) + \
+                (self.learning_rate * grad_weights)
+            self.weights = self.weights - weight_change
+            # updates old weight change for momentum
+            self.previous_weight_change = weight_change
+            self.biases = self.biases - self.learning_rate * grad_biases
         return grad_input
 
     def save_weights(self):

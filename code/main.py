@@ -36,7 +36,8 @@ if __name__ == '__main__':
                         help="file that contains the labels for the test data", type=str)
     parser.add_argument("-pd", "--plot_dir", default=None,
                         help="directory that has the plot data", type=str)
-    parser.add_argument("-ldt","--loadtwo",help="allows us to load the weights of the other model",default=None,type=str)                      
+    parser.add_argument(
+        "-ldt", "--loadtwo", help="allows us to load the weights of the other model", default=None, type=str)
     # parses the arguments
     args = parser.parse_args()
     mode = args.mode
@@ -49,7 +50,6 @@ if __name__ == '__main__':
     plot_dir = args.plot_dir
 
     second_weights = args.loadtwo
-    
 
     if plot_dir is not None:
         plot_dir = os.path.realpath(plot_dir)
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     # makes the output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    if mode < 4:
+    if mode < 4 or mode == 11:
         # gets the absolute path of the data and the labels
         labels_location = os.path.realpath(labels_location)
         data_location = os.path.realpath(data_location)
@@ -107,7 +107,7 @@ if __name__ == '__main__':
         print("Training and test data set made")
 
     # this is the mode that creates the MLP
-    elif mode == 3:
+    elif mode == 3 or mode == 11:
 
         if test_data_location is not None and test_labels_location is not None:
             # gets the absolute path of the data and the labels
@@ -119,8 +119,38 @@ if __name__ == '__main__':
             test_labels = load_text_label_file(test_labels_location)
 
         if weights_to_load is not None:
-            # print("wrong")
-            network = make_network(weights_to_load)
+            if mode == 3:
+                network = make_network(
+                    weights_to_load)
+            elif mode == 11:
+                network = []
+                full_path_weights = []
+                weights = os.listdir(weights_to_load)
+                for weight in weights:
+                    temp_path = weights_to_load + weight
+                    full_path_weights.append(os.path.realpath(temp_path))
+                weights = full_path_weights
+                network.append(
+                    Dense(784, 200, weights[0], False))
+                network.append(sigmoid_layer())
+                network.append(
+                    Dense(200, 10))
+                network.append(sigmoid_layer())
+            elif mode == 12:
+                network = []
+                full_path_weights = []
+                weights = os.listdir(weights_to_load)
+                for weight in weights:
+                    temp_path = weights_to_load + weight
+                    full_path_weights.append(os.path.realpath(temp_path))
+                weights = full_path_weights
+                network.append(
+                    Dense(784, 200, weights[0]))
+                network.append(sigmoid_layer())
+                network.append(
+                    Dense(200, 10))
+                network.append(sigmoid_layer())
+
         else:
             network = make_network()
 
@@ -195,11 +225,11 @@ if __name__ == '__main__':
                 print("test accuracy: ", test_accuracy)
                 print("loss: ", loss)
                 print("\n")
+                save_metrics(output_graph_dir, train_accuracy,
+                             test_accuracy, loss, epoch)
                 display = False
-
-            save_weights(network, new_output_dir)
-            save_metrics(output_graph_dir, train_accuracy,
-                         test_accuracy, loss, epoch)
+            if epoch % 100 == 0:
+                save_weights(network, new_output_dir)
             prediction_array.clear()
             actual_outputs_array.clear()
             # output = predict(network, x_batch[0])
@@ -330,7 +360,7 @@ if __name__ == '__main__':
             display = True
             for x_batch, y_batch in iterate_minibatches(train_data, train_data, batchsize=1024, shuffle=True):
                 loss_train = train_autoencoder(network, x_batch, y_batch)
-            if epoch % 10 == 0:
+            if epoch % 100 == 0:
                 loss_test = get_loss(network, test_data, test_data)
                 print("loss train: ", loss_train)
                 print("loss test: ", loss_test)
@@ -375,6 +405,15 @@ if __name__ == '__main__':
             prediction_array.append(predict_autoencoder(network, image))
         prediction_array = np.asarray(prediction_array)
 
+        high_range = 0.8
+        low_range = 1 - high_range
+        for i in range(len(prediction_array)):
+            for j in range(len(prediction_array[i])):
+                if prediction_array[i][j] > high_range:
+                    prediction_array[i][j] = 1
+                if prediction_array[i][j] < low_range:
+                    prediction_array[i][j] = 0
+
         # displays the images
         encoded_images = []
         real_images = []
@@ -386,17 +425,17 @@ if __name__ == '__main__':
         # plots the 8 images real and fake
         plot_autoencoder(encoded_images, real_images, images_labels)
 
-
     elif mode == 9:
         if weights_to_load is None:
             raise SyntaxError("must have weights to load into the model")
         if second_weights is None:
-            raise SyntaxError("must have second weights to load into the model")
-        #second_weights = os.path.realpath(second_weights)
+            raise SyntaxError(
+                "must have second weights to load into the model")
+        # second_weights = os.path.realpath(second_weights)
         mlp_network = make_network(weights_to_load)
         encoder_network = make_network(second_weights)
-        get_hidden_features(mlp_network,encoder_network)
-    
+        get_hidden_features(mlp_network, encoder_network)
+
     elif mode == 10:
         if weights_to_load is None:
             raise SyntaxError("must have weights to load into the model")
@@ -436,22 +475,20 @@ if __name__ == '__main__':
 
         network = make_network(weights_to_load)
 
-        train_loss = get_loss(network,train_data,train_data)
-        test_loss = get_loss(network,test_data,test_data)
+        train_loss = get_loss(network, train_data, train_data)
+        test_loss = get_loss(network, test_data, test_data)
 
-        print("train loss: ",train_loss)
-        print("test loss: ",test_loss)
+        print("train loss: ", train_loss)
+        print("test loss: ", test_loss)
 
-        plot_bar_loss(train_loss,test_loss,"Loss: All Data")
+        plot_bar_loss(train_loss, test_loss, "Loss: All Data")
 
         for i in range(10):
-            train_batch = get_data_by_label(train_data,train_labels,i)
-            test_batch = get_data_by_label(test_data,test_labels,i)
-            train_loss = get_loss(network,train_batch,train_batch)
-            test_loss = get_loss(network,test_batch,test_batch)
-            plot_bar_loss(train_loss,test_loss,"Loss: Number "+str(i))
-
-
+            train_batch = get_data_by_label(train_data, train_labels, i)
+            test_batch = get_data_by_label(test_data, test_labels, i)
+            train_loss = get_loss(network, train_batch, train_batch)
+            test_loss = get_loss(network, test_batch, test_batch)
+            plot_bar_loss(train_loss, test_loss, "Loss: Number "+str(i))
 
     else:
         raise SyntaxError("Not a valid run mode")
