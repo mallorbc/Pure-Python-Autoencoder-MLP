@@ -13,15 +13,17 @@ class Layer:
 
 
 class Dense(Layer):
-    def __init__(self, number_of_inputs, number_of_outputs, weights_to_load=None, is_trainable=True):
+    def __init__(self, number_of_inputs, number_of_outputs, weights_to_load=None, is_trainable=True, learning_rate=0.1):
         print("new layer with ", number_of_inputs,
               " neruons and ", number_of_outputs, " outputs")
         # sets the number of inputs and outputs
         self.number_of_inputs = number_of_inputs
         self.number_of_outputs = number_of_outputs
         self.trainable = is_trainable
+        self.learning_rate = learning_rate
         if self.trainable:
             print("Dense layer is trainable")
+            print("Learning rate of: ", self.learning_rate)
         else:
             print("Dense layer is not trainable")
         # sets the weights for the network
@@ -35,7 +37,7 @@ class Dense(Layer):
 
         # sets the biases in the layer
         self.set_biases()
-        self.learning_rate = 0.1
+        # self.learning_rate = 0.1
         self.momentum = 0.5
         self.previous_weight_change = 0
 

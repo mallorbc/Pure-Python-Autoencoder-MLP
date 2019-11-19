@@ -145,10 +145,10 @@ if __name__ == '__main__':
                     full_path_weights.append(os.path.realpath(temp_path))
                 weights = full_path_weights
                 network.append(
-                    Dense(784, 200, weights[0]))
+                    Dense(784, 200, weights[0], True, 0.01))
                 network.append(sigmoid_layer())
                 network.append(
-                    Dense(200, 10))
+                    Dense(200, 10, None, True, 0.1))
                 network.append(sigmoid_layer())
 
         else:
@@ -219,7 +219,7 @@ if __name__ == '__main__':
 
             # print("test acc: ", test_accuracy)
             # quit()
-            if epoch % 100 == 0 and display:
+            if epoch % 10 == 0:
                 print("epoch: ", epoch)
                 print("train accuracy: ", train_accuracy)
                 print("test accuracy: ", test_accuracy)
