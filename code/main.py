@@ -63,7 +63,7 @@ if __name__ == '__main__':
     # makes the output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    if mode < 4 or mode == 11:
+    if mode < 4 or mode == 11 or mode == 12:
         # gets the absolute path of the data and the labels
         labels_location = os.path.realpath(labels_location)
         data_location = os.path.realpath(data_location)
@@ -107,7 +107,7 @@ if __name__ == '__main__':
         print("Training and test data set made")
 
     # this is the mode that creates the MLP
-    elif mode == 3 or mode == 11:
+    elif mode == 3 or mode == 11 or mode == 12:
 
         if test_data_location is not None and test_labels_location is not None:
             # gets the absolute path of the data and the labels
