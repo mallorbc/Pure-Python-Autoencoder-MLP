@@ -1,5 +1,5 @@
-# Intelligent Systems HW3
-This project contains the code and and files for HW3.
+# Pure Python MLP and Autoencoder
+This project contains the code and and files for creating an autoencoder and mlp from scratch.
 
 ```docker/``` contains files related to running the code in a docker container.
 
